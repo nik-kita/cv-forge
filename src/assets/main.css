@@ -1,0 +1,17 @@
+@import './base.css';
+
+body {
+  height: 100vh;
+}
+
+#app {
+  height: 100%;
+  padding: 0.2rem;
+  font-family: 'Courier New', Courier, monospace;
+}
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}

@@ -1,0 +1,21 @@
+{
+  "$schema": "https://json.schemastore.org/prettierrc",
+  "semi": false,
+  "vueIndentScriptAndStyle": false,
+  "bracketSameLine": false,
+  "experimentalTernaries": true,
+  "printWidth": 60,
+  "tabWidth": 2,
+  "singleQuote": true,
+  "bracketSpacing": false,
+  "arrowParens": "avoid",
+  "singleAttributePerLine": true,
+  "overrides": [
+    {
+      "files": "*.vue",
+      "options": {
+        "parser": "vue"
+      }
+    }
+  ]
+}
