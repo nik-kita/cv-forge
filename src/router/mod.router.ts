@@ -17,10 +17,6 @@ const router = createRouter({
       component: () =>
         import('@/page/settings/SettingsPage.vue'),
     },
-    {
-      path: '/:pathMatch(.*)*',
-      redirect: '/profiles',
-    },
   ],
 })
 

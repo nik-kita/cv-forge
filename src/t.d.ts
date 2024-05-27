@@ -8,12 +8,14 @@ declare global {
       }
       context: {
         router: Router
+        allow_navigation: boolean
       }
     }
     type xapp = {
       input: {
         for_router: xrouter['input']
       }
+      context: {}
       children: {
         xrouter: 'xrouter'
       }
