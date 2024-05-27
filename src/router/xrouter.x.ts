@@ -1,6 +1,6 @@
 import {setup} from 'xstate'
 
-export const xrouter = setup({
+export const xrouter_machine = setup({
   types: {} as x.xrouter,
 }).createMachine({
   id: 'xrouter',
