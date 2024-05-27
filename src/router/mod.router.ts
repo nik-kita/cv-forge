@@ -1,8 +1,27 @@
+import ProfilesPage from '@/page/profiles/ProfilesPage.vue'
 import {createRouter, createWebHistory} from 'vue-router'
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
-  routes: [],
+  routes: [
+    {
+      path: '/',
+      redirect: '/profiles',
+    },
+    {
+      path: '/profiles',
+      component: ProfilesPage,
+    },
+    {
+      path: '/settings',
+      component: () =>
+        import('@/page/settings/SettingsPage.vue'),
+    },
+    {
+      path: '/:pathMatch(.*)*',
+      redirect: '/profiles',
+    },
+  ],
 })
 
 export default router
