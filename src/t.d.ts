@@ -10,6 +10,14 @@ declare global {
         router: Router
       }
     }
+    type xapp = {
+      input: {
+        for_router: xrouter['input']
+      }
+      children: {
+        xrouter: 'xrouter'
+      }
+    }
   }
 }
 
