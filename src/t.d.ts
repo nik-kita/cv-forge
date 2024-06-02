@@ -8,16 +8,18 @@ declare global {
     type types = {
       input: input
       context: context
-      event: event
+      events: events
     }
     type input = {
       router: Router
     }
     type context = {
       router: Router
-      allow_navigation: boolean
+      navigation: {
+        allow: boolean
+      }
     }
-    type event =
+    type events =
       | {
           type: '_.nav.to'
           payload: {
