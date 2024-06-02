@@ -3,7 +3,7 @@ import {xrouter_machine} from './router/xrouter.x'
 import type {Router} from 'vue-router'
 
 export const xapp_machine = setup({
-  types: {} as x.xapp,
+  types: {} as x.xapp.types,
   actors: {
     xrouter: xrouter_machine,
   },
