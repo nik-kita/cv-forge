@@ -1,61 +1,133 @@
-import {it, expect} from 'vitest'
-import {createMemoryHistory, createRouter} from 'vue-router'
-import {createActor} from 'xstate'
+import {it, expect, describe} from 'vitest'
+import {
+  createMemoryHistory,
+  createRouter,
+  type RouteMeta,
+} from 'vue-router'
+import {createActor, type StateValueFrom} from 'xstate'
 import {username_slugger_machine} from './username_slugger.x'
 
 const component = {
   template: `<button>Click to see nothing!</button>`,
 }
 
-it('x: username_slugger', async () => {
-  const path = '/hello/world'
-  const router = createRouter({
-    history: createMemoryHistory(),
-    routes: [
-      {
-        path,
-        meta: {
-          is_public: true,
-          x_nav_ev_name: 'nav.to.Home',
-        },
-        component,
+describe('x: username_slugger', () => {
+  it.each([
+    {
+      path: '/hello/world',
+      auth: 'guest' as 'guest' | 'user',
+      _with: '',
+      own_username: '',
+      expected: 'Guest::viewer',
+      meta: {
+        is_public: true,
+        x_nav_ev_name: 'nav.to.Home',
       },
-    ],
-  })
-  let is_router_before_each_called = false
-  let is_username_slugger_subscribtion_called = false
-  router.beforeEach(async (to, from) => {
-    is_router_before_each_called = true
-    const username_slugger = createActor(
-      username_slugger_machine,
-      {
-        input: {
-          is_user: false,
-          route: {
-            to,
+    },
+    {
+      path: '/hello/world/:username',
+      auth: 'guest' as 'guest' | 'user',
+      _with: '',
+      own_username: '',
+      expected: 'Guest::viewer',
+      meta: {
+        is_public: true,
+        x_nav_ev_name: 'nav.to.Home',
+      },
+    },
+    {
+      path: '/hello/world/:username',
+      auth: 'user' as 'guest' | 'user',
+      _with: 'with',
+      own_username: 'luffy',
+      expected: 'User::viewer',
+      meta: {
+        is_public: true,
+        x_nav_ev_name: 'nav.to.Home',
+      },
+    },
+    {
+      path: '/hello/world',
+      auth: 'guest' as 'guest' | 'user',
+      _with: '',
+      own_username: '',
+      expected: 'Guest::forbidden',
+      meta: {
+        is_public: false,
+        x_nav_ev_name: 'nav.to.Home',
+      },
+    },
+    {
+      path: '/hello/world',
+      auth: 'user' as 'guest' | 'user',
+      _with: '',
+      own_username: '',
+      expected: 'User::owner',
+      meta: {
+        is_public: false,
+        x_nav_ev_name: 'nav.to.Home',
+      },
+    }
+  ] satisfies {
+    path: string
+    meta: RouteMeta
+    auth: 'user' | 'guest'
+    own_username: string
+    _with: 'with' | 'without' | ''
+    expected: StateValueFrom<
+      typeof username_slugger_machine
+    >
+  }[])(
+    '$auth $_with $own_username on $path should be $expected',
+    async ({path, meta, auth, expected, own_username}) => {
+      const router = createRouter({
+        history: createMemoryHistory(),
+        routes: [
+          {
+            path,
+            meta,
+            component,
           },
-        },
-      },
-    )
-    username_slugger.subscribe(s => {
-      is_username_slugger_subscribtion_called = true
-      expect(s.status).toBe('done')
-      expect(s.value).toBe('Guest::viewer')
-    })
-    username_slugger.start()
-  })
+        ],
+      })
+      let is_router_before_each_called = false
+      let is_username_slugger_subscribtion_called = false
+      router.beforeEach(async (to, from) => {
+        is_router_before_each_called = true
+        const username_slugger = createActor(
+          username_slugger_machine,
+          {
+            input: {
+              is_user: auth === 'user',
+              route: {
+                to,
+              },
+            },
+          },
+        )
+        username_slugger.subscribe(s => {
+          is_username_slugger_subscribtion_called = true
+          expect(s.status).toBe('done')
+          expect(s.value).toBe(expected)
+        })
+        username_slugger.start()
+      })
 
-  await router.push(path)
-  await router.isReady()
+      await router.push(path)
+      await router.isReady()
 
-  await new Promise(resolve => setTimeout(resolve, 1000))
+      await new Promise(resolve =>
+        setTimeout(resolve, 1000),
+      )
 
-  expect(
-    is_router_before_each_called,
-    "router.beforeEach wasn't called",
-  )
-  expect(
-    is_username_slugger_subscribtion_called,
-    'username_slugger subscribtion was not called',
+      expect(
+        is_router_before_each_called,
+        "router.beforeEach wasn't called",
+      )
+      expect(
+        is_username_slugger_subscribtion_called,
+        'username_slugger subscribtion was not called',
+      )
+    },
   )
 })
