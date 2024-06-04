@@ -1,6 +1,6 @@
 import {setup} from 'xstate'
 
-export const username_slugger = setup({
+export const username_slugger_machine = setup({
   types: {} as x.xrouter.username_slugger.types,
   actions: {
     add_own_username_to_username_slug: function ({
@@ -105,28 +105,27 @@ export const username_slugger = setup({
                 },
                 Usernames_are_equal: {
                   always: {
-                    target:
-                      '#username_slug_logic.User::owner',
+                    target: '#username_slugger.User::owner',
                   },
                 },
                 Usernames_are_not_equal: {
                   always: {
                     target:
-                      '#username_slug_logic.User::viewer',
+                      '#username_slugger.User::viewer',
                   },
                 },
               },
             },
             User_without_username: {
               always: {
-                target: '#username_slug_logic.User::viewer',
+                target: '#username_slugger.User::viewer',
               },
             },
           },
         },
         Guest: {
           always: {
-            target: '#username_slug_logic.Guest::viewer',
+            target: '#username_slugger.Guest::viewer',
           },
         },
       },
@@ -170,7 +169,7 @@ export const username_slugger = setup({
                   always: [
                     {
                       target:
-                        '#username_slug_logic.User::owner',
+                        '#username_slugger.User::owner',
                       actions: {
                         type: 'add_own_username_to_username_slug',
                       },
@@ -180,7 +179,7 @@ export const username_slugger = setup({
                     },
                     {
                       target:
-                        '#username_slug_logic.User::viewer',
+                        '#username_slugger.User::viewer',
                     },
                   ],
                 },
@@ -188,8 +187,7 @@ export const username_slugger = setup({
             },
             Guest: {
               always: {
-                target:
-                  '#username_slug_logic.Guest::viewer',
+                target: '#username_slugger.Guest::viewer',
               },
             },
           },
@@ -212,13 +210,13 @@ export const username_slugger = setup({
             },
             User: {
               always: {
-                target: '#username_slug_logic.User::owner',
+                target: '#username_slugger.User::owner',
               },
             },
             Guest: {
               always: {
                 target:
-                  '#username_slug_logic.Guest::forbidden',
+                  '#username_slugger.Guest::forbidden',
               },
             },
           },

@@ -3,11 +3,9 @@ import type {
   Router,
 } from 'vue-router'
 
-// import 'vue-router'
-
 declare module 'vue-router' {
   interface RouteMeta {
-    x_nav_ev_name: NavEv_name
+    x_nav_ev_name: x.xrouter.events['type']
     username_slug?: {
       required: boolean
     }
