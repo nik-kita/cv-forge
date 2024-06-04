@@ -1,9 +1,34 @@
 import type {
-  Router,
   RouteLocationNormalized,
+  Router,
 } from 'vue-router'
 
+// import 'vue-router'
+
+declare module 'vue-router' {
+  interface RouteMeta {
+    x_nav_ev_name: NavEv_name
+    username_slug?: {
+      required: boolean
+    }
+    is_public: boolean
+  }
+}
+
 declare global {
+  namespace x.xrouter.username_slugger {
+    type types = {
+      input: input
+      context: context
+    }
+    type input = {
+      is_user: boolean
+      route: {
+        to: RouteLocationNormalized
+      }
+    }
+    type context = input
+  }
   namespace x.xrouter {
     type types = {
       input: input
