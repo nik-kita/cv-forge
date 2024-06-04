@@ -21,6 +21,7 @@ declare global {
     }
     type input = {
       is_user: boolean
+      own_username?: string
       route: {
         to: RouteLocationNormalized
       }
