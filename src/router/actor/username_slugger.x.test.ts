@@ -4,7 +4,11 @@ import {
   createRouter,
   type RouteMeta,
 } from 'vue-router'
-import {createActor, type StateValueFrom} from 'xstate'
+import {
+  createActor,
+  waitFor,
+  type StateValueFrom,
+} from 'xstate'
 import {username_slugger_machine} from './username_slugger.x'
 
 const component = {
@@ -26,6 +30,7 @@ describe('x: username_slugger', () => {
     },
     {
       path: '/hello/world/:username',
+      _path: '/hello/world/luffy',
       auth: 'guest' as 'guest' | 'user',
       _with: '',
       own_username: '',
@@ -33,17 +38,24 @@ describe('x: username_slugger', () => {
       meta: {
         is_public: true,
         x_nav_ev_name: 'nav.to.Home',
+        username_slug: {
+          required: false,
+        },
       },
     },
     {
       path: '/hello/world/:username',
+      _path: '/hello/world/luffy',
       auth: 'user' as 'guest' | 'user',
       _with: 'with',
       own_username: 'luffy',
-      expected: 'User::viewer',
+      expected: 'User::owner',
       meta: {
         is_public: true,
         x_nav_ev_name: 'nav.to.Home',
+        username_slug: {
+          required: false,
+        },
       },
     },
     {
@@ -67,9 +79,25 @@ describe('x: username_slugger', () => {
         is_public: false,
         x_nav_ev_name: 'nav.to.Home',
       },
-    }
+    },
+    {
+      path: '/hello/world/:username',
+      _path: '/hello/world/luffy',
+      auth: 'user' as 'guest' | 'user',
+      _with: 'with',
+      own_username: 'zoro',
+      expected: 'User::viewer',
+      meta: {
+        is_public: true,
+        x_nav_ev_name: 'nav.to.Home',
+        username_slug: {
+          required: false,
+        },
+      },
+    },
   ] satisfies {
     path: string
+    _path?: string
     meta: RouteMeta
     auth: 'user' | 'guest'
     own_username: string
@@ -79,7 +107,14 @@ describe('x: username_slugger', () => {
     >
   }[])(
     '$auth $_with $own_username on $path should be $expected',
-    async ({path, meta, auth, expected, own_username}) => {
+    async ({
+      path,
+      meta,
+      auth,
+      expected,
+      own_username,
+      _path,
+    }) => {
       const router = createRouter({
         history: createMemoryHistory(),
         routes: [
@@ -92,6 +127,7 @@ describe('x: username_slugger', () => {
       })
       let is_router_before_each_called = false
       let is_username_slugger_subscribtion_called = false
+      let done: Promise<any>
       router.beforeEach(async (to, from) => {
         is_router_before_each_called = true
         const username_slugger = createActor(
@@ -102,6 +138,7 @@ describe('x: username_slugger', () => {
               route: {
                 to,
               },
+              own_username,
             },
           },
         )
@@ -111,15 +148,15 @@ describe('x: username_slugger', () => {
           expect(s.value).toBe(expected)
         })
         username_slugger.start()
+        done = waitFor(
+          username_slugger,
+          s => s.status === 'done',
+        )
       })
 
-      await router.push(path)
+      await router.push(_path || path)
       await router.isReady()
-
-      await new Promise(resolve =>
-        setTimeout(resolve, 1000),
-      )
-
+      await done!
       expect(
         is_router_before_each_called,
         "router.beforeEach wasn't called",
