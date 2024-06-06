@@ -20,8 +20,8 @@ export const username_slugger_machine = setup({
     },
   },
   guards: {
-    is_username_slug_present: function ({context, event}) {
-      return !!context.route.to.meta.username_slug
+    is_username_slug_exist: function ({context, event}) {
+      return !!context.route.to.params.username
     },
     is_public: function ({context, event}) {
       return context.route.to.meta.is_public
@@ -32,10 +32,13 @@ export const username_slugger_machine = setup({
     has_user_username: function ({context, event}) {
       return !!context.own_username
     },
+    is_username_slug_possible: function ({context, event}) {
+      return !!context.route.to.meta.username_slug
+    },
     'is.equal': is_equal as typeof is_equal<string>,
   },
 }).createMachine({
-  /** @xstate-layout N4IgpgJg5mDOIC5QFdZgE4DsCGBbMA+rADbJQzoB0AwgPa4AOyALoahjvkaVAMQDaABgC6iUA1qwAlsym1MYkAA9EAFkGUAzAE5BAVm2rVADgBMq0wEZjAdj0AaEAE9ElwTc2U9AX2+P2WHiEJGQUNPRMrAQBnME8ApaiSCAS0rLyiioI6lq6BkZmFtZ2ji4Ilpaall6+-miBXCHkGJQA6jIAFtH1sdxk4YwshNgsHQIiiqkycgrJWdY6lNrL2gBshoVW2qWIutU+fiAxQX3NVO3MXceNPAORw6MJSeKS0xlzrsaLK2sb5ls7BDaAw1Q7XOKhFoXK49E5NSgAVXqdyG3QwaIaYHGzxSr3Ss1A83Wpkopk0qnJBX+lm2zkQmlW1VMBzqHDhPDC0IxvXhSJadEGUQC3KCT0meJmmVcq2ZpPJlJM1NpZVM2k8LKOsJukPOnRF2qgiORfPQBAA7nrwSihVq4AQwABHZDYYgyJzY8VpSUfBDM1TaLw2YyCQyKiymQE6Yyg1mY06cy2205Glom82Jtn4a1sW2we1Ol1usXJKb4qW+0xWQPB0ObCN0hCaEEa8HxqEZuO8431dOXfVgFOYvPYdCER3O4geksS96ExDMmyrUlrGx2Gk2VQ2etlSwUzxkzSCTQ6cl2YyrWqazMQs5tDs824mwe9mHXwexYejgiYWjMfMTqcXi9WdlFcGw3EofRzGPClVmMPRjGMQFLH+ShN1UVY9FMDw4O0YxL1bJoEz7QjH27dELUuWgWH7QDcWAglQIQABaaw9A0YkT0Q1VzGQ1D0Mw7CGWMbRVwIpMiPbEiJNuABxZA4GYOjS29OdfUwrRK1E1Z-Q8ZkkIbSpNBJZlBEEZlTCPL4j3E682yoAA5Wh+2TAV7gIdBqKiBh0CkAA3bAAGN3SEHEVJArJWKbJljBQ4M9EsOwg0sQFwNszsORaJyXPhNzUU81EfP8oKQsST03kYyLKj0PRl3WfQEqS2LkMsC8wRknVKGy0j+gABWQAAjV1Ao8ryBzyqIRkuZSZ0qxBWLwmxILMo99ESvRksjSsYyvDLOu6jrDX6oapBGgrWGzAgprGfgyunBjy2YyzBCZDbjApF6mpShsGSW5l0offbnJ6o7BuG0ahkHShes8wK4DzWgzUwWjQvKssfSej6llUPQqmZQEdJsAH2SBnLbmO8HzoHJ8YdoOHYARpGUbuoCKseyyRLlCkSgbVZ1koLdMJlFtDrCA67PhCnTohi75MUmaHox96lz0HSEs0L5Wo276d2PEz2PMrCrMPTRiYNMXgcO6HfICqIqcu66FbZpXVk8HGqnUfSg20HX6VWP6RYlzLHMtoO+pt7A7bGh3HlusLZse2wlvAkMsLPb3feyGlSUDvbb3FvPreKqPIZNJ30bU1jBH9rwaT0CwaqPDxVGQvc5RNk9NwQtrY0B-PQ8LmHi8Ie25dgJTUfu53K4MANNajCxdDyVvj3bo9O7PVRfEOH8IDgRQQYoNHVKYp6EIMspmMXrwVsEIxyT5jczZvMIJpzMOoGPiL5psZV5vJUwz97J3mkh-L+c1ygWUBE9cyy0Vr3wwv7TQRN2of2Iq+Qub8rqjHAeWSolZoEVFUDtQ+UkMF90HLgn0lh2IX3-tUW+d8KSII8HYIBkldSgMLk+LBwpwRULUolZqDZVYkNFmQsm-QnxpkouQoIAimI0gIYZGqSwfg1UwnrV27Dg4gLkQaKGMj7xBEuuCPM45CzMDKKzCuTErDsUBNBMRaCJEg0MT2WR-Z3xBE-GOAsxAFFZFMtuRACUt6oLzugyRhppEeOMVmE0H4rpfh-H+CxASp62PmKJQQgIKTRlzn3KJbjYkUU6F5fsgTXAaOQqrHRnUuRuLHswKp5RDy5IbMxAp9T+7RNaWfdQ0D3o33gcwx+yCekW2iZdKmBAioBWCv0lCW5IyTKygPChUszpjX6eYbQITyibjQuo1WuNjLaIiUU9Z0ytky3GhEVE10ln7JsI4psayQ43LBtLe2JpdlGBbg2bCS1-QrA0Wc0wPddpXM+W425vzkS03pozZG-DMkn0imSNYkZMIfK6hskmoMTrbMhs0pZW4HANhxvhS5hKplwojiXVgSyaGAp3GsAWoLgSnK0abWl5trkMuHncmOlx+m2DZfOYZ-1+Uv0FVbIetsR7Rz+ei7+LEKjVxxYUul8qP5FyVSKslaqIHMVWGZPJiU8XNIQAgPyUgwBmgwP0owmciG1R1QKqgJpbX2sdc6k17M3CZ2WEtT1crvX1FtYjTAAabEYvmmSGwGhuaUt1qqZxkSWg2oQAAM1oOgAaUgIB70YuFU1rramiIOL4IAA */
+  /** @xstate-layout N4IgpgJg5mDOIC5QFdZgE4DsCGBbMA+rADbJQzoB0AwgPa4AOyALoahjvkaVAMQDaABgC6iUA1qwAlsym1MYkAA9EAFkGUAzAE5BAVm2rVADgBMq0wEZjAdj0AaEAE9ElwTc2U9AX2+P2WHiEJGQUNPRMrAQBnME8ApaiSCAS0rLyiioI6lq6BkZmFtZ2ji4Ilpaall6+-miBXCHkGJQA6jIAFgSp0gBGxGz1sdxk4YwshNgsHQIiiqkycgrJWZXGepSWNtoAbDq2lqamNqWIR5Sqljsegtq6tqY7xrUgMUEjzVTtzF09Uv2DDjvJpjSKTaYJJLiSSLDIrVyaOyUO53Az5QRGHancrHSiCYyaHQ2HambSHVQ+PyvIbAnhhb6-SR9AbRGmNHiUACq9VBE1ZGH5DTAsyhKRh6WWoFWO20Ni812u21Jl1UJ2cCI0dkEghJ2mMth1Zheb3ZoRaDO6TP+LJNcVG3JadHGUQCgtikPm4qWmVcO1UO3lxJsZhsgh0hOxpm1mx2sb9ipJelMzypto+9M6ltgzMBQo+XJ5DvQBAA7pnbbyXWy4AQwABHZDYYgyJwiz1pb3whDJnLmVXXTSqTR6Kpqsp6PTGLza7WD27BpPG6vp82Zv4At20+2F+ql8vVyu52KwWsNpstj3JBYSn3dvSHSh9oOD4ej7H37TTmdz2XrUxLoFTU+No1ytDc0xBIsCwFMsfk3fBoKFE9sHQQh60bYg2yvL04SlM49GJR9dhsOxLFlVVTGxSwh08UxCTDcNVUnHYALzJoMzg9cbWXSCdxg-dALARDjwIFDCEwWhmFPDCsOhDtcOUVwbDcPEkxoocnknYwqPMUwLhsf0kw8J49VY4Z2NXTiwO4wT8ygos9x+WgWHg4UhFFa9OzwhAAFprD0DQZTo7RNH1UlzB0ix9MM45NBMkizK3YCLS4o8ksoABxZA4GYWSxXkyVFO7HYNk0I5ZT9WUysnKjCT00wAsEBqo1CzQw0SoCwgAOVoVz8ydMECHQZyogYdApAAN2wABjVt3PbWFCqyPzh2qZNDmMfQtgI4xLGxZSOrtYCer6kEBr5Ya+TGyaZrmxIFpvLsVonIiZX0e87GDPb1XKK5DpXKgTogjkAAVkH6KRpqGkahPOqIph+PLPIU5ayNsPFvy2z7duxMq9MpOpbIswHeuB0YwYhqHLtYQ9RIhfh7uwgrbx8qNBDWnah3Z7HvrKOK5Qa-7icoIGeNB8HmypmHEMoEHhumuAT1oEtMFcpGcKWxBWa55EKSqBrsT9GwhbpFpRaJ8XKehiYZbl2gFezAhldV21LzkxaWajYxPzoocSh+2NPxsR49ETE2zRJ07Lcl62aaynL1eZp7jH9eUKTWKoSuU2qysfRrmrDAl2tTMWI5F0nS6gWXxqmqJqdhiI+QRmZ5qZj3k72C4R2oprJ2DMlceuPPw+OiuLfJmvsDr6W4fBRGGY8jWWdsOVlNuIy++93m1DI4eS-H0eo4nm7p5totE-b7y-J1OUPz0CwJzDDxVComjH3owkQqY4wWP3tjTcjmTKucsT6EHrplbKsBcqt3do9K+BhPwEkqHqCwug8iv0JO-Nqn9Bx2BTiPDijJszWjSkBGWDlYJdArLPI+UBaxKCkFA7AmAFYXzgUVKMTxNjp3MPfH+6gHA-XvFOAyKIyLBx2E1bQBDLJEJzLQ8hu5KGuVpkA+hjDmDMNYQvB6XkirWG0Hpai94ozbGDMSLEAdoxan0IOCw+pZS+CpBJCAcBFBAIoLolGWsGr6mxD5VBX4Zwpy2LoY2f9zIANUZXLxmtfLbH8YOf8ESkqEKzPIoBsTbxuDuMiFExFJGhhfj9VmTUMYznxJcbY7hkmE3-mXFK1lSFHVps3LJXZKhHH8RUVQNQUmdVkekkhCiiztO8tRb2WhCR1RChOA2P1LjlJnEFHYhw9gyK+KBYh4FK4yxoa6W0Yz9HaAMJQOM1wMQGUeE1HSU5GraksCOIwDFwl1MiQ0rZGTdn2SUQJIURzViFDOcpK4bgQ4nMoj9fWeJwxhkTLcVZGyQJWW2TZepVcfn8TgtQxuVZBInnQueZgZRYF6KyH2QKcZg4-wqNvbIYYglhnUL+EcSLGmouaXZPixZlEViLCJMS0kmwArOEqM5VLkyrIqIbAySymXzj-Gyz5wygGKKxVQg8-KgjIVQgQCSUlCXEBFd2a54rYzUqlXSgwdyKk-gXLU6kB80mpRGdyxyHQRquWNY8xEUzpmkmHEmQRZRHhTgqU1UKTxVC7FUEqlFXyD4QJyt66icp8kFPcBiSKlACTTNWQZMwbhNBIvNui41rN76CH8SnC4KI5mhXMIiSwJax7otpvXbok9ZrlsOMHXGLaFEUxjvXct5hDGv1vjOIwxJtokleY69F3VW3vOARLSGscG7Ojnh0HthixxnGHAO1VQ713gNGW3dhy0+zFJDSRIJ0782h2OEe3ZJ6pZnx5HbB2SsVZeovWSnxOhLF8xKi+xNb6N1JqgT24Owa1CTjA22kBtcwEwx7Y8m9rhdiUBsQ+2dxb+lHSXYOyep8aY0Laf+7xvlbCYe7DWwWhGAblxI6AyD57SXUb8m4YDiA4oEwXSu4jx7SOoZtvHaDVG4k+UkVWhZWwkUSeYAgBAE0pBgBLBgctRg6U9I2AJjxLQiwqbUxprTUnPZuDpXcW+SLjMIGduZzj0m6KhguIiOD5QyqfgM5XMISmVMADNaDoF6FICArjCrI2kzpqiE4Ay+adYMl1qrMU8r+bEaJB91FMJYWAb1thPCxjRMcai-prC41ySOEKGJ-RPB-tIpjwt2UJrbWl91KjMAaYAARMNYN1ywBXg7AoqKspqJUIX7XxDh-QsoDBlVG047wQA */
   context({input}) {
     return {
       ...input,
@@ -47,17 +50,17 @@ export const username_slugger_machine = setup({
     Compute_username_slug: {
       always: [
         {
-          target: 'With_username_slug',
+          target: 'With_possible_username_slug',
           guard: {
-            type: 'is_username_slug_present',
+            type: 'is_username_slug_possible',
           },
         },
         {
-          target: 'No_username_slug',
+          target: 'Username_slug_impossible',
         },
       ],
     },
-    With_username_slug: {
+    With_possible_username_slug: {
       initial: 'Compute_auth',
       states: {
         Compute_auth: {
@@ -90,8 +93,23 @@ export const username_slugger_machine = setup({
               ],
             },
             User_with_username: {
-              initial: 'Compute_usernames_equality',
+              initial: 'Compute_username_slug_existance',
+
               states: {
+                Compute_username_slug_existance: {
+                  always: [
+                    {
+                      target: 'Compute_usernames_equality',
+                      guard: 'is_username_slug_exist',
+                    },
+                    {
+                      target:
+                        '#username_slugger.User::owner',
+                      actions:
+                        'add_own_username_to_username_slug',
+                    },
+                  ],
+                },
                 Compute_usernames_equality: {
                   always: [
                     {
@@ -112,11 +130,13 @@ export const username_slugger_machine = setup({
                     },
                   ],
                 },
+
                 Usernames_are_equal: {
                   always: {
                     target: '#username_slugger.User::owner',
                   },
                 },
+
                 Usernames_are_not_equal: {
                   always: {
                     target:
@@ -139,7 +159,7 @@ export const username_slugger_machine = setup({
         },
       },
     },
-    No_username_slug: {
+    Username_slug_impossible: {
       initial: 'Compute_route_privacy',
       states: {
         Compute_route_privacy: {
@@ -172,26 +192,8 @@ export const username_slugger_machine = setup({
               ],
             },
             User: {
-              initial: 'Process_own_username',
-              states: {
-                Process_own_username: {
-                  always: [
-                    {
-                      target:
-                        '#username_slugger.User::owner',
-                      actions: {
-                        type: 'add_own_username_to_username_slug',
-                      },
-                      guard: {
-                        type: 'has_user_username',
-                      },
-                    },
-                    {
-                      target:
-                        '#username_slugger.User::viewer',
-                    },
-                  ],
-                },
+              always: {
+                target: '#username_slugger.User::owner',
               },
             },
             Guest: {

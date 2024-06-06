@@ -16,6 +16,66 @@ const component = {
 }
 
 describe('x: username_slugger', () => {
+  it('should auto add own username to slug', async () => {
+    const router = createRouter({
+      history: createMemoryHistory(),
+      routes: [
+        {
+          path: '/hello/world/:username?',
+          meta: {
+            is_public: true,
+            x_nav_ev_name: 'nav.to.Home',
+            username_slug: {
+              required: false,
+            },
+          },
+          component,
+        },
+      ],
+    })
+    let is_router_before_each_called = false
+    let is_username_slugger_subscribtion_called = false
+    let done: Promise<any>
+    router.beforeEach(async (to, from) => {
+      expect(to.params.username).toBeFalsy()
+      is_router_before_each_called = true
+      const username_slugger = createActor(
+        username_slugger_machine,
+        {
+          input: {
+            is_user: true,
+            route: {
+              to,
+            },
+            own_username: 'luffy',
+          },
+        },
+      )
+      username_slugger.subscribe(s => {
+        is_username_slugger_subscribtion_called = true
+        expect(s.status).toBe('done')
+        expect(s.value).toBe('User::owner')
+      })
+      username_slugger.start()
+      done = waitFor(
+        username_slugger,
+        s => s.status === 'done',
+      ).then(() => expect(to.params.username).toBe('luffy'))
+      await done
+    })
+
+    await router.replace('/hello/world')
+    await router.isReady()
+    await done!
+    expect(
+      is_router_before_each_called,
+      "router.beforeEach wasn't called",
+    )
+    expect(
+      is_username_slugger_subscribtion_called,
+      'username_slugger subscribtion was not called',
+    )
+  })
   it.each([
     {
       path: '/hello/world',
