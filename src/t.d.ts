@@ -33,12 +33,16 @@ declare global {
       input: input
       context: context
       events: events
+      children: {
+        username_slugger: 'username_slugger'
+      }
     }
     type input = {
       router: Router
+      is_user: () => boolean
+      get_username: () => string | undefined
     }
-    type context = {
-      router: Router
+    type context = input & {
       navigation: {
         allow: boolean
       }

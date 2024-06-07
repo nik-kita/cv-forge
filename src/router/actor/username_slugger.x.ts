@@ -236,15 +236,42 @@ export const username_slugger_machine = setup({
     },
     'Guest::viewer': {
       type: 'final',
+      output({context}) {
+        return {
+          to: context.route.to,
+          role_on_current_page: 'guest::viewer',
+        }
+      },
     },
     'User::viewer': {
       type: 'final',
+
+      output({context}) {
+        return {
+          to: context.route.to,
+          role_on_current_page: 'user::viewer',
+        }
+      },
     },
     'User::owner': {
       type: 'final',
+
+      output({context}) {
+        return {
+          to: context.route.to,
+          role_on_current_page: 'user::owner',
+        }
+      },
     },
     'Guest::forbidden': {
       type: 'final',
+
+      output({context}) {
+        return {
+          to: context.route.to,
+          role_on_current_page: 'guest::forbidden',
+        }
+      },
     },
   },
 })
