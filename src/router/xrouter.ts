@@ -86,7 +86,7 @@ export const machine = setup({
     }
   },
   id: 'xrouter',
-  initial: '_Processing_navigation',
+  initial: 'Idle',
   on: {
     nav: {
       target: '#xrouter._Processing_navigation',
@@ -102,16 +102,18 @@ export const machine = setup({
     },
   },
   states: {
+    Idle: {},
     _Processing_navigation: {
       invoke: {
         input({event, context}) {
           assertEvent(event, 'nav')
+
           return {
             to: event.to,
           }
         },
         onDone: {
-          target: '_Complete_navigation',
+          target: 'Idle',
 
           actions: {
             type: 'raise_navigate',
@@ -120,7 +122,6 @@ export const machine = setup({
         src: 'xslugger',
       },
     },
-    _Complete_navigation: {},
     Pages: {
       initial: 'Home',
       states: {

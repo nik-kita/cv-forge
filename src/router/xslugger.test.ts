@@ -1,12 +1,11 @@
 import {describe, expect, it, vi} from 'vitest'
-import {createActor, waitFor} from 'xstate'
-import {machine} from './xslugger'
 import {
   createMemoryHistory,
   createRouter,
-  type RouteLocationNormalized,
   type RouteMeta,
 } from 'vue-router'
+import {createActor, waitFor} from 'xstate'
+import {machine} from './xslugger'
 
 describe('xslugger', () => {
   it.each([
@@ -16,7 +15,7 @@ describe('xslugger', () => {
       path_to_push: '/test',
       meta: {
         public: true,
-        x_event: '_',
+        x_event: 'nav.Home',
       },
       expected: {
         path: '/test',
@@ -29,7 +28,7 @@ describe('xslugger', () => {
       path_to_push: '/test/zoro',
       meta: {
         public: true,
-        x_event: '_',
+        x_event: 'nav.Home',
       },
       expected: {
         path: '/test/zoro',
@@ -42,7 +41,7 @@ describe('xslugger', () => {
       path_to_push: '/test',
       meta: {
         public: true,
-        x_event: '_',
+        x_event: 'nav.Home',
       },
       expected: {
         path: '/test/luffy',
@@ -54,7 +53,7 @@ describe('xslugger', () => {
       path_to_push: '/test',
       meta: {
         public: true,
-        x_event: '_',
+        x_event: 'nav.Home',
       },
       expected: {
         path: '/test',
@@ -66,7 +65,7 @@ describe('xslugger', () => {
       path_to_push: '/test',
       meta: {
         public: false,
-        x_event: '_',
+        x_event: 'nav.Home',
       },
       expected: {
         ok: false,
@@ -78,7 +77,7 @@ describe('xslugger', () => {
       path_to_push: '/test',
       meta: {
         public: false,
-        x_event: '_',
+        x_event: 'nav.Home',
       },
       expected: {
         path: '/test',

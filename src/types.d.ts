@@ -29,6 +29,8 @@ declare global {
     export type DoneActorEv<Id extends string, T> =
       | SuccessDoneActorEv<Id, T>
       | FailDoneActorEv<Id, T>
+
+    export type InitEv = {type: 'xstate.init'}
   }
 
   type Tail<T extends any[]> =
