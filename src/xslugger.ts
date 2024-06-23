@@ -76,21 +76,23 @@ export const machine = setup({
         }
       },
     }),
-    add_own_username_to_username_slug: function ({
-      context,
-      event,
-    }) {
-      if (
-        !context.output?.path ||
-        !context.user?.username
-      ) {
-        throw new Error(
-          'This action should not be called if either path or username is missing',
-        )
-      }
+    add_own_username_to_username_slug: assign({
+      output({context}) {
+        if (
+          !context.output?.path ||
+          !context.user?.username
+        ) {
+          throw new Error(
+            'This action should not be called if either path or username is missing',
+          )
+        }
 
-      context.output.path = `${context.output!.path}/${context.user.username}`
-    },
+        return {
+          ...context.output,
+          path: `${context.output.path}/${context.user.username}`,
+        }
+      },
+    }),
   },
   guards: {
     is_username_slug_present: function ({context, event}) {
