@@ -5,15 +5,19 @@ export const machine = setup({
   types: {
     input: {} as {
       to: RouteLocationNormalized
-      user?: User
+      user?: app.User
     },
     context: {} as {
       to: RouteLocationNormalized
-      user?: User
+      user?: app.User
       output?:
         | {
             ok: true
             path: string
+            x_event:
+              | 'nav.Home'
+              | 'nav.ProfilesList'
+              | 'nav.SingleProfile'
             role: 'owner' | 'user::viewer' | 'guest::viewer'
           }
         | {
@@ -27,6 +31,10 @@ export const machine = setup({
       | {
           ok: true
           path: string
+          x_event:
+            | 'nav.Home'
+            | 'nav.ProfilesList'
+            | 'nav.SingleProfile'
           role: 'owner' | 'user::viewer' | 'guest::viewer'
         }
       | {
@@ -40,6 +48,7 @@ export const machine = setup({
         ({
           ok: true,
           path: context.to.path,
+          x_event: context.to.meta.x_event,
           role: 'guest::viewer',
         }) as const,
     }),
@@ -49,6 +58,10 @@ export const machine = setup({
         params:
           | {
               ok: true
+              x_event:
+                | 'nav.Home'
+                | 'nav.ProfilesList'
+                | 'nav.SingleProfile'
               role:
                 | 'owner'
                 | 'user::viewer'
@@ -62,11 +75,12 @@ export const machine = setup({
       ) {
         const {ok} = params
         if (ok) {
-          const {path, role} = params
+          const {path, role, x_event} = params
           return {
             ok,
             path,
             role,
+            x_event,
           } as const
         } else {
           return {
@@ -337,6 +351,7 @@ export const machine = setup({
 
           return {
             ok: true,
+            x_event: context.to.meta.x_event,
             role: 'guest::viewer',
             path: context.output.path,
           }
@@ -357,6 +372,7 @@ export const machine = setup({
           return {
             ok: true,
             role: 'user::viewer',
+            x_event: context.to.meta.x_event,
             path: context.output.path,
           }
         },
@@ -376,6 +392,7 @@ export const machine = setup({
           return {
             ok: true,
             role: 'owner',
+            x_event: context.to.meta.x_event,
             path: context.output.path,
           }
         },
