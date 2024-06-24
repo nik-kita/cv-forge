@@ -12,18 +12,18 @@
   - `tailwind.config.ts`
 
     ```ts
-    import type {Config} from 'tailwindcss'
+    import type { Config } from "tailwindcss";
 
     export default {
       content: [
-        './index.html',
-        './src/**/*.{vue,js,ts,jsx,tsx}',
+        "./index.html",
+        "./src/**/*.{vue,js,ts,jsx,tsx}",
       ],
       theme: {
         extend: {},
       },
       plugins: [],
-    } satisfies Config
+    } satisfies Config;
     ```
 
   - `postcss.config.js`
@@ -41,7 +41,6 @@
       },
       plugins: [],
     } satisfies Config
-
     ```
 
   - `src/assets/base.css`
@@ -60,6 +59,6 @@
     ```
   - `src/main.ts`
     ```ts
-    import './assets/main.css'
+    import "./assets/main.css";
     // ----------------------------------------------
     ```
