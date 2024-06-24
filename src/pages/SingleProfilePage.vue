@@ -1,0 +1,1 @@
+<template>Single profile</template>

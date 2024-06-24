@@ -1,3 +1,4 @@
+import HomePage from '@/pages/HomePage.vue'
 import {createRouter, createWebHistory} from 'vue-router'
 
 export const init_router = () =>
@@ -14,9 +15,7 @@ export const init_router = () =>
       },
       {
         path: '/home/:username?',
-        component: {
-          template: '<h1>Home</h1>',
-        },
+        component: HomePage,
         meta: {
           public: true,
           x_event: 'nav.Home',
@@ -24,9 +23,8 @@ export const init_router = () =>
       },
       {
         path: '/profiles/:username?',
-        component: {
-          template: '<h1>Profiles list</h1>',
-        },
+        component: () =>
+          import('@/pages/ProfilesListPage.vue'),
         meta: {
           public: true,
           x_event: 'nav.ProfilesList',
@@ -34,9 +32,8 @@ export const init_router = () =>
       },
       {
         path: '/profile/:name/:username?',
-        component: {
-          template: '<h1>Single profile</h1>',
-        },
+        component: () =>
+          import('@/pages/SingleProfilePage.vue'),
         meta: {
           public: true,
           x_event: 'nav.SingleProfile',
