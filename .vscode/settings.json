@@ -4,5 +4,11 @@
   "deno.enablePaths": [
     "lab/x-entry-or-always-action-raise.test.ts"
   ],
-  "cSpell.words": ["xrouter", "xslugger"]
+  "cSpell.words": [
+    "xapi",
+    "xfetch",
+    "xrouter",
+    "xslugger",
+    "xstore"
+  ]
 }
