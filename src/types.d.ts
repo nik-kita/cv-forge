@@ -1,6 +1,28 @@
+import type {paths} from '@/api/openapi'
 import type {DoneActorEvent, ErrorActorEvent} from 'xstate'
 
 declare global {
+  namespace api {
+    type Method = 'get' | 'post' | 'put' | 'delete'
+    type Endpoint = keyof paths
+    type Req<
+      M extends Method,
+      T extends keyof paths,
+    > = paths[T][M]['requestBody']['content']['application/json']
+    type Res<
+      M extends Method,
+      T extends keyof paths,
+    > = paths[T][M]['responses']['200']['content']['application/json']
+    type Err<
+      M extends Method,
+      T extends keyof paths,
+      S extends number,
+    > = {
+      json: () => Promise<
+        paths[T][M]['responses'][`${S}`]['content']['application/json']
+      >
+    }
+  }
   namespace app {
     type User = {
       username?: string
