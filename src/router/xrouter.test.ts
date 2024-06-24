@@ -1,7 +1,8 @@
-import {describe, expect, it} from 'vitest'
-import {machine} from './xrouter'
+import {beforeEach, describe, expect, it} from 'vitest'
+import type {Router} from 'vue-router'
 import {createActor} from 'xstate'
-import router from './mod.router'
+import {machine} from './xrouter'
+import {init_router} from './mod.router'
 
 describe('xrouter', () => {
   it.each([
@@ -10,14 +11,15 @@ describe('xrouter', () => {
       expected: '/home/luffy',
       get_user: () => ({username: 'luffy'}),
     },
-    // {
-    //   link: '/home/zoro',
-    //   expected: '/home/zoro',
-    //   get_user: () => ({username: 'luffy'}),
-    // },
+    {
+      link: '/home/zoro',
+      expected: '/home/zoro',
+      get_user: () => ({username: 'luffy'}),
+    },
   ])(
     '$link => $expected',
     async ({link, get_user, expected}) => {
+      const router = init_router()
       const xrouter = createActor(machine, {
         input: {
           router,
