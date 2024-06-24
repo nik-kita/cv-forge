@@ -1,5 +1,6 @@
 import type {paths} from '@/api/openapi'
 import type {DoneActorEvent, ErrorActorEvent} from 'xstate'
+import type {WritableComputedRef, ComputedRef} from 'vue'
 
 declare global {
   namespace api {
@@ -30,7 +31,25 @@ declare global {
   }
 
   namespace x {
-    export type SuccessDoneActorEv<
+    type XStore = {
+      nik_curr_route_param: Ref<string | null | undefined>
+      is_user: ComputedRef<boolean>
+      user: Ref<
+        | {
+            nik?: string | null
+          }
+        | undefined
+      >
+      nik: WritableComputedRef<string | null | undefined>
+      viewer_role: Ref<
+        'guest::viewer' | 'user::viewer' | 'owner'
+      >
+      clean_auth(): void
+      update_auth(
+        payload: api.Res<'post', '/auth/sign-in'>,
+      ): void
+    }
+    type SuccessDoneActorEv<
       Id extends string,
       T,
     > = OmitReplace<
@@ -39,7 +58,7 @@ declare global {
         type: `xstate.done.actor.${Id}`
       }
     >
-    export type FailDoneActorEv<
+    type FailDoneActorEv<
       Id extends string,
       T,
     > = OmitReplace<
@@ -48,11 +67,11 @@ declare global {
         type: `xstate.error.actor.${Id}`
       }
     >
-    export type DoneActorEv<Id extends string, T> =
+    type DoneActorEv<Id extends string, T> =
       | SuccessDoneActorEv<Id, T>
       | FailDoneActorEv<Id, T>
 
-    export type InitEv = {type: 'xstate.init'}
+    type InitEv = {type: 'xstate.init'}
   }
 
   type Tail<T extends any[]> =
