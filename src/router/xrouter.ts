@@ -14,8 +14,10 @@ export const machine = setup({
   types: {
     input: {} as {
       router: Router
+      get_user: () => app.User | undefined
     },
     context: {} as {
+      get_user: () => app.User | undefined
       router: Router
       is_navigation_allowed: boolean
     },
@@ -82,9 +84,11 @@ export const machine = setup({
   context({input}) {
     return {
       router: input.router,
+      get_user: input.get_user,
       is_navigation_allowed: false,
     }
   },
+  entry: 'integrate_router',
   id: 'xrouter',
   initial: 'Idle',
   on: {
@@ -110,6 +114,7 @@ export const machine = setup({
 
           return {
             to: event.to,
+            user: context.get_user(),
           }
         },
         onDone: {
@@ -120,14 +125,21 @@ export const machine = setup({
           },
         },
         src: 'xslugger',
+        id: 'xslugger',
       },
     },
     Pages: {
       initial: 'Home',
       states: {
-        Home: {},
-        SingleProfile: {},
-        ProfilesList: {},
+        Home: {
+          entry: 'navigate',
+        },
+        SingleProfile: {
+          entry: 'navigate',
+        },
+        ProfilesList: {
+          entry: 'navigate',
+        },
       },
     },
   },

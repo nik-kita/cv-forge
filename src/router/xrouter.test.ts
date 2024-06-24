@@ -7,14 +7,27 @@ describe('xrouter', () => {
   it.each([
     {
       link: '/',
-      expected: '/home',
+      expected: '/home/luffy',
+      get_user: () => ({username: 'luffy'}),
     },
-  ])('', async ({link}) => {
-    const xrouter = createActor(machine, {
-      input: {
-        router,
-      },
-    })
-    xrouter.start()
-  })
+    // {
+    //   link: '/home/zoro',
+    //   expected: '/home/zoro',
+    //   get_user: () => ({username: 'luffy'}),
+    // },
+  ])(
+    '$link => $expected',
+    async ({link, get_user, expected}) => {
+      const xrouter = createActor(machine, {
+        input: {
+          router,
+          get_user,
+        },
+      })
+      xrouter.start()
+      await router.push(link)
+      await router.isReady()
+      expect(router.currentRoute.value.path).toBe(expected)
+    },
+  )
 })
