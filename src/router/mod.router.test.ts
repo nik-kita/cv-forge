@@ -1,5 +1,5 @@
 import {expect, it, describe} from 'vitest'
-import router from './mod.router'
+import {init_router} from './mod.router'
 
 describe('Router username, navigation, redirects', () => {
   it.each([
@@ -30,6 +30,7 @@ describe('Router username, navigation, redirects', () => {
   ])(
     '$path_to_push => $expected_path',
     async ({expected_path, path_to_push}) => {
+      const router = init_router()
       await router.push(path_to_push)
       expect(router.currentRoute.value.path).toBe(
         expected_path,
