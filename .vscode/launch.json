@@ -1,0 +1,18 @@
+{
+  // For more information, visit: https://go.microsoft.com/fwlink/?linkid=830387
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "command": "npm run test:unit --test-timeout",
+      "name": "test:unit",
+      "request": "launch",
+      "type": "node-terminal"
+    },
+    {
+      "command": "npx vitest xrouter",
+      "name": "test:unit xrouter",
+      "request": "launch",
+      "type": "node-terminal"
+    },
+  ]
+}

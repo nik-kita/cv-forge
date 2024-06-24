@@ -1,0 +1,49 @@
+{
+	"files": [
+		{
+			"path": "src/router/xrouter.ts",
+			"bookmarks": [
+				{
+					"line": 55,
+					"column": 19,
+					"label": "X_EVENT::xrouter (navigate action)"
+				}
+			]
+		},
+		{
+			"path": "src/router/types.router.d.ts",
+			"bookmarks": [
+				{
+					"line": 4,
+					"column": 12,
+					"label": "X_EVENT::types"
+				}
+			]
+		},
+		{
+			"path": "src/router/xslugger.ts",
+			"bookmarks": [
+				{
+					"line": 16,
+					"column": 28,
+					"label": "X_EVENT xslugger | context | output"
+				},
+				{
+					"line": 30,
+					"column": 33,
+					"label": "X_EVENT xslugger | output"
+				},
+				{
+					"line": 54,
+					"column": 77,
+					"label": "X_EVENT xslugger | generate output | params"
+				},
+				{
+					"line": 55,
+					"column": 16,
+					"label": "ROLE xslugger output"
+				}
+			]
+		}
+	]
+}

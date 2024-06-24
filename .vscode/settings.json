@@ -1,0 +1,8 @@
+{
+  "deno.enable": true,
+  "deno.disablePaths": ["./src/*"],
+  "deno.enablePaths": [
+    "lab/x-entry-or-always-action-raise.test.ts"
+  ],
+  "cSpell.words": ["xrouter", "xslugger"]
+}
