@@ -1,6 +1,6 @@
 import type {paths} from '@/api/openapi'
+import type {ComputedRef, WritableComputedRef} from 'vue'
 import type {DoneActorEvent, ErrorActorEvent} from 'xstate'
-import type {WritableComputedRef, ComputedRef} from 'vue'
 
 declare global {
   namespace api {
@@ -9,7 +9,31 @@ declare global {
     type Req<
       M extends Method,
       T extends keyof paths,
-    > = paths[T][M]['requestBody']['content']['application/json']
+    > = Prettify<
+      {
+        body: paths[T][M]['requestBody']['content']['application/json']
+      } & (paths[T][M]['parameters']['header'] extends (
+        never | undefined
+      ) ?
+        {}
+      : {
+          headers: paths[T][M]['parameters']['header']
+        }) &
+        (paths[T][M]['parameters']['query'] extends (
+          never | undefined
+        ) ?
+          {}
+        : {
+            query: paths[T][M]['parameters']['query']
+          }) &
+        (paths[T][M]['parameters']['path'] extends (
+          never | undefined
+        ) ?
+          {}
+        : {
+            params: paths[T][M]['parameters']['path']
+          })
+    >
     type Res<
       M extends Method,
       T extends keyof paths,
@@ -89,6 +113,9 @@ declare global {
     T extends Record<string, any>,
     U extends Record<string, any>,
   > = Omit<T, keyof U> & U
+  type Prettify<T> = {
+    [K in keyof T]: T[K]
+  } & {}
 }
 
 export {}
