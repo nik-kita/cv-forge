@@ -714,7 +714,9 @@ export interface operations {
   get_profile_by_name_profiles__name__get: {
     parameters: {
       query?: never
-      header?: never
+      header: {
+        authorization: string
+      }
       path: {
         name: string
       }
@@ -747,7 +749,9 @@ export interface operations {
   get_all_profiles_profiles__get: {
     parameters: {
       query?: never
-      header?: never
+      header: {
+        authorization: string
+      }
       path?: never
       cookie?: never
     }
@@ -762,12 +766,23 @@ export interface operations {
           'application/json': components['schemas']['PaginatedRes_ProfileRes_']
         }
       }
+      /** @description Validation Error */
+      422: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['HTTPValidationError']
+        }
+      }
     }
   }
   upsert_profile_profiles__post: {
     parameters: {
       query?: never
-      header?: never
+      header: {
+        authorization: string
+      }
       path?: never
       cookie?: never
     }
@@ -800,7 +815,9 @@ export interface operations {
   delete_profile_profiles__profile_id__delete: {
     parameters: {
       query?: never
-      header?: never
+      header: {
+        authorization: string
+      }
       path: {
         profile_id: number
       }
@@ -829,7 +846,9 @@ export interface operations {
   modify_profile_profiles__profile_id__patch: {
     parameters: {
       query?: never
-      header?: never
+      header: {
+        authorization: string
+      }
       path: {
         profile_id: number
       }
@@ -866,7 +885,9 @@ export interface operations {
       query: {
         canditate: string
       }
-      header?: never
+      header: {
+        authorization: string
+      }
       path?: never
       cookie?: never
     }
@@ -895,7 +916,9 @@ export interface operations {
   modify_nik_user_nik__nik__put: {
     parameters: {
       query?: never
-      header?: never
+      header: {
+        authorization: string
+      }
       path: {
         nik: string
       }
@@ -935,7 +958,9 @@ export interface operations {
   rm_nik_user_nik_delete: {
     parameters: {
       query?: never
-      header?: never
+      header: {
+        authorization: string
+      }
       path?: never
       cookie?: never
     }
@@ -947,6 +972,15 @@ export interface operations {
           [name: string]: unknown
         }
         content?: never
+      }
+      /** @description Validation Error */
+      422: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['HTTPValidationError']
+        }
       }
     }
   }
@@ -984,7 +1018,9 @@ export interface operations {
   get_me_me_get: {
     parameters: {
       query?: never
-      header?: never
+      header: {
+        authorization: string
+      }
       path?: never
       cookie?: never
     }
@@ -997,6 +1033,15 @@ export interface operations {
         }
         content: {
           'application/json': components['schemas']['UserRes']
+        }
+      }
+      /** @description Validation Error */
+      422: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['HTTPValidationError']
         }
       }
     }
