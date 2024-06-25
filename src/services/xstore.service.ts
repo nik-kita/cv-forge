@@ -40,11 +40,11 @@ const is_user = computed(() => {
 const viewer_role = ref<
   'guest::viewer' | 'user::viewer' | 'owner'
 >('guest::viewer')
-const nik_curr_route_param = ref(nik.value)
+const username_slug = ref(nik.value)
 
 export const use_xstore = (): x.XStore => {
   return {
-    nik_curr_route_param,
+    username_slug,
     is_user,
     user,
     nik,

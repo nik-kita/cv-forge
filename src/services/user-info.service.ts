@@ -16,6 +16,6 @@ export const get_user_info = <T = any>() => {
 
     return JSON.parse(data) as Partial<T>
   } catch (err) {
-    console.error(err)
+    return
   }
 }

@@ -32,7 +32,7 @@ declare global {
 
   namespace x {
     type XStore = {
-      nik_curr_route_param: Ref<string | null | undefined>
+      username_slug: Ref<string | null | undefined>
       is_user: ComputedRef<boolean>
       user: Ref<
         | {
