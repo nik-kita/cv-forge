@@ -1,4 +1,15 @@
+import {get_access_token} from '@/services/jwt-token.service'
+
 const api_url = import.meta.env.VITE_API_URL
+const req_config = {
+  get_access_token,
+}
+
+export const _update_req_config = (
+  actual: Partial<typeof req_config>,
+) => {
+  Object.assign(req_config, actual)
+}
 
 const api_request = async <
   M extends api.Method,
@@ -6,11 +17,19 @@ const api_request = async <
 >(
   endpoint: string,
   method: 'get' | 'post' | 'put' | 'delete',
-  access_token?: string,
+  is_access_token_required: boolean,
   body?: api.Req<M, E>,
   init?: OmitStrict<RequestInit, 'body'>,
   is_json = true,
 ) => {
+  const access_token =
+    is_access_token_required &&
+    req_config.get_access_token()
+
+  if (is_access_token_required === null) {
+    throw new Error('access_token is required')
+  }
+
   const response = await fetch(api_url + endpoint, {
     ...init,
     method,
@@ -36,13 +55,12 @@ const api_request = async <
 export const req = {
   get: async <E extends api.Endpoint>(
     endpoint: string,
-    access_token: string,
     init?: OmitStrict<RequestInit, 'body'>,
   ) =>
     api_request<'get', E>(
       endpoint,
       'get',
-      access_token,
+      true,
       undefined,
       init,
     ),
@@ -50,13 +68,12 @@ export const req = {
   post: async <E extends api.Endpoint>(
     endpoint: string,
     body: api.Req<'post', E>,
-    access_token: string,
     init?: OmitStrict<RequestInit, 'body'>,
   ) =>
     api_request<'post', E>(
       endpoint,
       'post',
-      access_token,
+      true,
       body,
       init,
     ),
@@ -64,26 +81,24 @@ export const req = {
   put: async <E extends api.Endpoint>(
     endpoint: string,
     body: api.Req<'put', E>,
-    access_token: string,
     init?: OmitStrict<RequestInit, 'body'>,
   ) =>
     api_request<'put', E>(
       endpoint,
       'put',
-      access_token,
+      true,
       body,
       init,
     ),
 
   delete: async <E extends api.Endpoint>(
     endpoint: string,
-    access_token: string,
     init?: OmitStrict<RequestInit, 'body'>,
   ) =>
     api_request<'delete', E>(
       endpoint,
       'delete',
-      access_token,
+      true,
       undefined,
       init,
       false,
@@ -95,7 +110,7 @@ export const req = {
     api_request<'get', E>(
       endpoint,
       'get',
-      undefined,
+      false,
       undefined,
       init,
     ),
@@ -108,7 +123,7 @@ export const req = {
     api_request<'post', E>(
       endpoint,
       'post',
-      undefined,
+      false,
       body,
       init,
     ),
@@ -121,7 +136,7 @@ export const req = {
     api_request<'put', E>(
       endpoint,
       'put',
-      undefined,
+      false,
       body,
       init,
     ),
@@ -133,7 +148,7 @@ export const req = {
     api_request<'delete', E>(
       endpoint,
       'delete',
-      undefined,
+      false,
       undefined,
       init,
       false,
