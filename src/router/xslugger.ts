@@ -90,52 +90,44 @@ export const machine = setup({
         }
       },
     }),
-    add_own_username_to_username_slug: assign({
+    add_own_nik_to_nik_slug: assign({
       output({context}) {
-        if (
-          !context.output?.path ||
-          !context.user?.username
-        ) {
+        if (!context.output?.path || !context.user?.nik) {
           throw new Error(
-            'This action should not be called if either path or username is missing',
+            'This action should not be called if either path or nik is missing',
           )
         }
 
         return {
           ...context.output,
-          path: `${context.output.path}/${context.user.username}`,
+          path: `${context.output.path}/${context.user.nik}`,
         }
       },
     }),
   },
   guards: {
-    is_username_slug_present: function ({context, event}) {
-      return !!context.to.params.username
+    is_nik_slug_present: function ({context, event}) {
+      return !!context.to.params.nik
     },
     is_user: function ({context, event}) {
       return !!context.user
     },
-    has_user_username: function ({context, event}) {
+    has_user_nik: function ({context, event}) {
       if (!context.user) {
         throw new Error(
           'This guard should not be called if user is missing',
         )
       }
-      return !!context.user.username
+      return !!context.user.nik
     },
-    is_usernames_equal: function ({context, event}) {
-      if (
-        !context.user?.username ||
-        !context.to.params.username
-      ) {
+    is_niks_equal: function ({context, event}) {
+      if (!context.user?.nik || !context.to.params.nik) {
         throw new Error(
-          'This guard should not be called if either username is missing',
+          'This guard should not be called if either nik is missing',
         )
       }
 
-      return (
-        context.user.username === context.to.params.username
-      )
+      return context.user.nik === context.to.params.nik
     },
     is_public: function ({context, event}) {
       return context.to.meta.public
@@ -155,23 +147,23 @@ export const machine = setup({
     return context.output
   },
   entry: 'init_output',
-  id: 'username_slugger',
-  initial: 'Compute_username_slug',
+  id: 'nik_slugger',
+  initial: 'Compute_nik_slug',
   states: {
-    Compute_username_slug: {
+    Compute_nik_slug: {
       always: [
         {
-          target: 'With_username_slug',
+          target: 'With_nik_slug',
           guard: {
-            type: 'is_username_slug_present',
+            type: 'is_nik_slug_present',
           },
         },
         {
-          target: 'No_username_slug',
+          target: 'No_nik_slug',
         },
       ],
     },
-    With_username_slug: {
+    With_nik_slug: {
       initial: 'Compute_auth',
       states: {
         Compute_auth: {
@@ -188,65 +180,64 @@ export const machine = setup({
           ],
         },
         User: {
-          initial: 'Compute_user_username',
+          initial: 'Compute_user_nik',
           states: {
-            Compute_user_username: {
+            Compute_user_nik: {
               always: [
                 {
-                  target: 'User_with_username',
+                  target: 'User_with_nik',
                   guard: {
-                    type: 'has_user_username',
+                    type: 'has_user_nik',
                   },
                 },
                 {
-                  target: 'User_without_username',
+                  target: 'User_without_nik',
                 },
               ],
             },
-            User_with_username: {
-              initial: 'Compute_usernames_equality',
+            User_with_nik: {
+              initial: 'Compute_niks_equality',
               states: {
-                Compute_usernames_equality: {
+                Compute_niks_equality: {
                   always: [
                     {
-                      target: 'Usernames_are_equal',
+                      target: 'niks_are_equal',
                       guard: {
-                        type: 'is_usernames_equal',
+                        type: 'is_niks_equal',
                       },
                     },
                     {
-                      target: 'Usernames_are_not_equal',
+                      target: 'niks_are_not_equal',
                     },
                   ],
                 },
-                Usernames_are_equal: {
+                niks_are_equal: {
                   always: {
-                    target: '#username_slugger.Owner',
+                    target: '#nik_slugger.Owner',
                   },
                 },
-                Usernames_are_not_equal: {
+                niks_are_not_equal: {
                   always: {
-                    target:
-                      '#username_slugger.User::viewer',
+                    target: '#nik_slugger.User::viewer',
                   },
                 },
               },
             },
-            User_without_username: {
+            User_without_nik: {
               always: {
-                target: '#username_slugger.User::viewer',
+                target: '#nik_slugger.User::viewer',
               },
             },
           },
         },
         Guest: {
           always: {
-            target: '#username_slugger.Guest::viewer',
+            target: '#nik_slugger.Guest::viewer',
           },
         },
       },
     },
-    No_username_slug: {
+    No_nik_slug: {
       initial: 'Compute_route_privacy',
       states: {
         Compute_route_privacy: {
@@ -279,22 +270,21 @@ export const machine = setup({
               ],
             },
             User: {
-              initial: 'Process_own_username',
+              initial: 'Process_own_nik',
               states: {
-                Process_own_username: {
+                Process_own_nik: {
                   always: [
                     {
-                      target: '#username_slugger.Owner',
+                      target: '#nik_slugger.Owner',
                       actions: {
-                        type: 'add_own_username_to_username_slug',
+                        type: 'add_own_nik_to_nik_slug',
                       },
                       guard: {
-                        type: 'has_user_username',
+                        type: 'has_user_nik',
                       },
                     },
                     {
-                      target:
-                        '#username_slugger.User::viewer',
+                      target: '#nik_slugger.User::viewer',
                     },
                   ],
                 },
@@ -302,7 +292,7 @@ export const machine = setup({
             },
             Guest: {
               always: {
-                target: '#username_slugger.Guest::viewer',
+                target: '#nik_slugger.Guest::viewer',
               },
             },
           },
@@ -325,13 +315,12 @@ export const machine = setup({
             },
             User: {
               always: {
-                target: '#username_slugger.Owner',
+                target: '#nik_slugger.Owner',
               },
             },
             Guest: {
               always: {
-                target:
-                  '#username_slugger.Guest::forbidden',
+                target: '#nik_slugger.Guest::forbidden',
               },
             },
           },

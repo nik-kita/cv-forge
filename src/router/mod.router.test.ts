@@ -1,7 +1,7 @@
 import {expect, it, describe} from 'vitest'
 import {init_router} from './mod.router'
 
-describe('Router username, navigation, redirects', () => {
+describe('Router nik, navigation, redirects', () => {
   it.each([
     {
       path_to_push: '/test',

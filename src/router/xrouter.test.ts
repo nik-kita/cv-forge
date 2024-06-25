@@ -9,12 +9,12 @@ describe('xrouter', () => {
     {
       link: '/',
       expected: '/home/luffy',
-      get_user: () => ({username: 'luffy'}),
+      get_user: () => ({nik: 'luffy'}),
     },
     {
       link: '/home/zoro',
       expected: '/home/zoro',
-      get_user: () => ({username: 'luffy'}),
+      get_user: () => ({nik: 'luffy'}),
     },
   ])(
     '$link => $expected',

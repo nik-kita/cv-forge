@@ -14,7 +14,7 @@ export const init_router = () =>
         redirect: '/home',
       },
       {
-        path: '/home/:username?',
+        path: '/home/:nik?',
         component: HomePage,
         meta: {
           public: true,
@@ -22,7 +22,7 @@ export const init_router = () =>
         },
       },
       {
-        path: '/profiles/:username?',
+        path: '/profiles/:nik?',
         component: () =>
           import('@/pages/ProfilesListPage.vue'),
         meta: {
@@ -31,7 +31,7 @@ export const init_router = () =>
         },
       },
       {
-        path: '/profile/:name/:username?',
+        path: '/profile/:name/:nik?',
         component: () =>
           import('@/pages/SingleProfilePage.vue'),
         meta: {

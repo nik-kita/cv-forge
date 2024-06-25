@@ -11,7 +11,7 @@ describe('xslugger', () => {
   it.each([
     {
       user: {},
-      path: '/test/:username?',
+      path: '/test/:nik?',
       path_to_push: '/test',
       meta: {
         public: true,
@@ -23,8 +23,8 @@ describe('xslugger', () => {
       },
     },
     {
-      user: {username: 'luffy'},
-      path: '/test/:username?',
+      user: {nik: 'luffy'},
+      path: '/test/:nik?',
       path_to_push: '/test/zoro',
       meta: {
         public: true,
@@ -36,8 +36,8 @@ describe('xslugger', () => {
       },
     },
     {
-      user: {username: 'luffy'},
-      path: '/test/:username?',
+      user: {nik: 'luffy'},
+      path: '/test/:nik?',
       path_to_push: '/test',
       meta: {
         public: true,
@@ -49,7 +49,7 @@ describe('xslugger', () => {
       },
     },
     {
-      path: '/test/:username?',
+      path: '/test/:nik?',
       path_to_push: '/test',
       meta: {
         public: true,

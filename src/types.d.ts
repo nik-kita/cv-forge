@@ -26,13 +26,13 @@ declare global {
   }
   namespace app {
     type User = {
-      username?: string
+      nik?: string
     }
   }
 
   namespace x {
     type XStore = {
-      username_slug: Ref<string | null | undefined>
+      nik_slug: Ref<string | null | undefined>
       is_user: ComputedRef<boolean>
       user: Ref<
         | {
