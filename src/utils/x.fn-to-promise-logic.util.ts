@@ -14,7 +14,7 @@ export const fn_with_many_args_to_promise_logic = <
   )
 }
 
-export const fn_args_to_promise_logic = <
+export const fn_to_promise_logic = <
   T extends (arg: any) => any | Promise<any>,
 >(
   fn: T,
