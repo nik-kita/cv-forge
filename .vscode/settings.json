@@ -10,5 +10,6 @@
     "xrouter",
     "xslugger",
     "xstore"
-  ]
+  ],
+  "vue.server.hybridMode": true
 }
