@@ -1,5 +1,5 @@
 import {get_access_token} from '@/services/jwt-token.service'
-
+import type {api} from '@/api/api.types'
 const api_url = import.meta.env.VITE_API_URL
 const req_config = {
   get_access_token,
@@ -48,7 +48,7 @@ const api_request = async <
   }
 
   return (is_json ? response.json() : undefined) as Promise<
-    api.Res<M, E>
+    api_deprecated.Res<M, E>
   >
 }
 

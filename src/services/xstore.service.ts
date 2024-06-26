@@ -53,7 +53,9 @@ export const use_xstore = (): x.XStore => {
       update_tokens()
       user.value = undefined
     },
-    update_auth(payload: api.Res<'post', '/auth/sign-in'>) {
+    update_auth(
+      payload: api_deprecated.Res<'post', '/auth/sign-in'>,
+    ) {
       update_tokens(payload)
       const user_info = {nik: payload.nik}
       update_user_info(user_info)

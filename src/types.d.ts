@@ -3,37 +3,9 @@ import type {ComputedRef, WritableComputedRef} from 'vue'
 import type {DoneActorEvent, ErrorActorEvent} from 'xstate'
 
 declare global {
-  namespace api {
+  namespace api_deprecated {
     type Method = 'get' | 'post' | 'put' | 'delete'
     type Endpoint = keyof paths
-    type Req<
-      M extends Method,
-      T extends keyof paths,
-    > = Prettify<
-      {
-        body: paths[T][M]['requestBody']['content']['application/json']
-      } & (paths[T][M]['parameters']['header'] extends (
-        never | undefined
-      ) ?
-        {}
-      : {
-          headers: paths[T][M]['parameters']['header']
-        }) &
-        (paths[T][M]['parameters']['query'] extends (
-          never | undefined
-        ) ?
-          {}
-        : {
-            query: paths[T][M]['parameters']['query']
-          }) &
-        (paths[T][M]['parameters']['path'] extends (
-          never | undefined
-        ) ?
-          {}
-        : {
-            params: paths[T][M]['parameters']['path']
-          })
-    >
     type Res<
       M extends Method,
       T extends keyof paths,
@@ -71,7 +43,10 @@ declare global {
       >
       clean_auth(): void
       update_auth(
-        payload: api.Res<'post', '/auth/sign-in'>,
+        payload: api_deprecated.Res<
+          'post',
+          '/auth/sign-in'
+        >,
       ): void
     }
     type SuccessDoneActorEv<

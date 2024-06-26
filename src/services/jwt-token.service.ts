@@ -8,7 +8,7 @@ export const get_refresh_token = () => {
 
 export const update_tokens = (
   payload?: Pick<
-    api.Res<'post', '/auth/sign-in'>,
+    api_deprecated.Res<'post', '/auth/sign-in'>,
     'access_token' | 'refresh_token'
   >,
 ) => {

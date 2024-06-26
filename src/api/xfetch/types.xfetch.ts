@@ -5,22 +5,35 @@ import type {
 
 export namespace xfetch {
   export type Input = {
-    api: <T extends api.Method, U extends api.Endpoint>(
-      payload: api.Req<T, U>,
-    ) => Promise<api.Res<T, U>>
-    payload: api.Req<api.Method, api.Endpoint>
+    api: <
+      T extends api_deprecated.Method,
+      U extends api_deprecated.Endpoint,
+    >(
+      payload: api_deprecated.Req<T, U>,
+    ) => Promise<api_deprecated.Res<T, U>>
+    payload: api_deprecated.Req<
+      api_deprecated.Method,
+      api_deprecated.Endpoint
+    >
     _get_access_token?: () => string | null
     _get_refresh_token?: () => string | null
   }
   export type Output =
     | {
         ok: true
-        success: api.Res<api.Method, api.Endpoint>
+        success: api_deprecated.Res<
+          api_deprecated.Method,
+          api_deprecated.Endpoint
+        >
       }
     | {
         ok: false
         error?:
-          | api.Err<api.Method, api.Endpoint, number>
+          | api_deprecated.Err<
+              api_deprecated.Method,
+              api_deprecated.Endpoint,
+              number
+            >
           | unknown
       }
   export type Context = Pick<Input, 'api' | 'payload'> & {
