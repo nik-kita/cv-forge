@@ -19,6 +19,13 @@
       "name": "test:unit xfetch",
       "request": "launch",
       "type": "node-terminal"
+    },
+    {
+      "command": "npx vitest url",
+      "name": "test:unit url",
+      "request": "launch",
+      "type": "node-terminal"
     }
+  
   ]
 }
