@@ -14,5 +14,11 @@
       "request": "launch",
       "type": "node-terminal"
     },
+    {
+      "command": "npx vitest xfetch",
+      "name": "test:unit xfetch",
+      "request": "launch",
+      "type": "node-terminal"
+    }
   ]
 }

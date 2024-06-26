@@ -1,5 +1,5 @@
 import {fn_to_promise_logic} from '@/utils/x.fn-to-promise-logic.util'
-import {setup} from 'xstate'
+import {assign, setup} from 'xstate'
 import {_xfetch_config} from './globals.xfetch'
 import type {xfetch} from './types.xfetch'
 
@@ -20,10 +20,30 @@ export const machine = setup({
   },
 }).createMachine({
   id: 'xfetch',
-  invoke: {
-    src: 'api',
-    input({context}) {
-      return context
+  initial: 'Start',
+  output({context: {output}}) {
+    if (!output) return {ok: false, error: 'no output'}
+    return output
+  },
+  states: {
+    Start: {
+      invoke: {
+        src: 'api',
+        input({context}) {
+          return context
+        },
+        onDone: {
+          target: 'Finish',
+          actions: assign({
+            output: ({event}) => {
+              return {ok: true, success: event.output}
+            },
+          }),
+        },
+      },
+    },
+    Finish: {
+      type: 'final',
     },
   },
   context({input}) {

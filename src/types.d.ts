@@ -37,7 +37,8 @@ declare global {
     type Res<
       M extends Method,
       T extends keyof paths,
-    > = paths[T][M]['responses']['200']['content']['application/json']
+      N extends number = 200,
+    > = paths[T][M]['responses'][N]['content']['application/json']
     type Err<
       M extends Method,
       T extends keyof paths,
