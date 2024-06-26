@@ -2,19 +2,14 @@ import type {
   get_access_token,
   get_refresh_token,
 } from '@/services/jwt-token.service'
+import type {api} from '../api.types'
 
 export namespace xfetch {
   export type Input = {
-    api: <
-      T extends api_deprecated.Method,
-      U extends api_deprecated.Endpoint,
-    >(
-      payload: api_deprecated.Req<T, U>,
-    ) => Promise<api_deprecated.Res<T, U>>
-    payload: api_deprecated.Req<
-      api_deprecated.Method,
-      api_deprecated.Endpoint
-    >
+    api: (
+      payload: api.Req<any, any>,
+    ) => Promise<api_deprecated.Res<any, any>>
+    payload: api.Req<any, any>
     _get_access_token?: () => string | null
     _get_refresh_token?: () => string | null
   }

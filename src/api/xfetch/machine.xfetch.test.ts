@@ -15,13 +15,14 @@ describe('xfetch machine', () => {
 
     const actor = createActor(machine, {
       input: {
-        api: api as any,
+        api,
         payload: {
-          body: {},
-          headers: {},
+          headers: {authorization: 'Bearer token'},
           params: {nik: 'luffy'},
-          query: {},
-        },
+        } satisfies api.Req<
+          'put',
+          '/user/nik/{nik}'
+        > as api.Req<any, any>,
       },
     })
     let done: any
