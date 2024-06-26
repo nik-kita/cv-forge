@@ -19,11 +19,12 @@ export const fn_to_promise_logic = <
 >(
   fn: T,
 ) => {
-  return fromPromise<Awaited<ReturnType<T>>, Parameters<T>>(
-    async ({input}) => {
-      const result = await fn(input)
+  return fromPromise<
+    Awaited<ReturnType<T>>,
+    Parameters<T>[0]
+  >(async ({input}) => {
+    const result = await fn(input)
 
-      return result
-    },
-  )
+    return result
+  })
 }
