@@ -1,13 +1,30 @@
-import type {api} from '../api.types'
 import type {ActorRefFrom, PromiseActorLogic} from 'xstate'
+import type {api} from '../api.types'
 
+// export function xfetch<T extends [Method: api.Method, Endpoint: api.Endpoint]>
+// (
+//   payload?: T extends (infer R extends api.Req<T[0], T[1]> & (
+//     {
+//       headers?:
+//         | {
+//             authorization?: never
+//           }
+//         | never
+//     }
+//   ) ?
+//     R & {is_public: true}
+//   : api.Req<T, U>,
+// ): ActorRefFrom<
+//   PromiseActorLogic<
+//     api_deprecated.Res<T, U>,
+//     typeof payload
+//     >
+// >
 export function xfetch<
-  T extends api.Method,
-  U extends api.Endpoint,
+  T extends [method: api.Method, endpoint: api.Endpoint],
 >(
-  fn: (arg: api.Req<T, U>) => api_deprecated.Res<T, U>,
-  payload?: Parameters<typeof fn>[0] extends (
-    {
+  payload: T extends (
+    infer Pub extends api.Req<T[0], T[1]> & {
       headers?:
         | {
             authorization?: never
@@ -15,30 +32,36 @@ export function xfetch<
         | never
     }
   ) ?
-    api.Req<T, U> & {is_public: true}
-  : api.Req<T, U>,
+    Pub & {is_public: true}
+  : T extends (
+    infer Priv extends api.Req<T[0], T[1]> & {
+      headers: {
+        authorization: string
+      }
+    }
+  ) ?
+    OmitStrict<Priv, 'headers'> & {
+      headers: OmitStrict<Priv['headers'], 'authorization'>
+    }
+  : never,
 ): ActorRefFrom<
   PromiseActorLogic<
-    api_deprecated.Res<T, U>,
-    {
-      fn: typeof fn
-      payload: typeof payload
-    }
+    api_deprecated.Res<T[0], T[1]>,
+    typeof payload
   >
 >
 export function xfetch<
-  T extends api.Method,
-  U extends api.Endpoint,
+  T extends [method: api.Method, endpoint: api.Endpoint],
 >(
-  fn: (arg: api.Req<T, U>) => api_deprecated.Res<T, U>,
-  payload?: Partial<api.Req<T, U> & {is_public: true}>,
+  payload?: Partial<
+    api.Req<T[0], T[1]> & {
+      is_public: true
+    }
+  >,
 ): ActorRefFrom<
   PromiseActorLogic<
-    api_deprecated.Res<T, U>,
-    {
-      fn: typeof fn
-      payload: typeof payload
-    }
+    api_deprecated.Res<T[0], T[1]>,
+    typeof payload
   >
 > {
   return '// TODO' as any
