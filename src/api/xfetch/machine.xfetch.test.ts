@@ -5,28 +5,21 @@ import type {api} from '../api.types'
 
 describe('xfetch machine', () => {
   it('should make simple api call', async () => {
-    const api: (
-      payload: api.Req<'put', '/user/nik/{nik}'>,
-    ) => Promise<
-      api_deprecated.Res<'put', '/user/nik/{nik}'>
-    > = async payload => {
-      return {nik: payload.params.nik}
-    }
-
     const actor = createActor(machine, {
       input: {
-        api,
+        is_public: true,
         payload: {
-          headers: {authorization: 'Bearer token'},
-          params: {nik: 'luffy'},
+          endpoint: '/hello-world',
+          method: 'get',
         } satisfies api.Req<
-          'put',
-          '/user/nik/{nik}'
+          'get',
+          '/hello-world'
         > as api.Req<any, any>,
       },
     })
     let done: any
     actor.subscribe(s => {
+      console.log(s.value)
       if (s.status === 'done' && s.output.ok) {
         done = s.output.success
       }
@@ -36,6 +29,6 @@ describe('xfetch machine', () => {
 
     await waitFor(actor, s => s.status !== 'active')
 
-    expect(done).toEqual({nik: 'luffy'})
+    expect(done).toEqual({message: 'Hello World!'})
   })
 })

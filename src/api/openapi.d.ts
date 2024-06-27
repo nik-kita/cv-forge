@@ -210,6 +210,23 @@ export interface paths {
     patch?: never
     trace?: never
   }
+  '/hello-world': {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    /** Hello World */
+    get: operations['hello_world_hello_world_get']
+    put?: never
+    post?: never
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
 }
 export type webhooks = Record<string, never>
 export interface components {
@@ -714,8 +731,8 @@ export interface operations {
   get_profile_by_name_profiles__name__get: {
     parameters: {
       query?: never
-      header: {
-        authorization: string
+      header?: {
+        authorization?: string | null
       }
       path: {
         name: string
@@ -749,8 +766,8 @@ export interface operations {
   get_all_profiles_profiles__get: {
     parameters: {
       query?: never
-      header: {
-        authorization: string
+      header?: {
+        authorization?: string | null
       }
       path?: never
       cookie?: never
@@ -780,8 +797,8 @@ export interface operations {
   upsert_profile_profiles__post: {
     parameters: {
       query?: never
-      header: {
-        authorization: string
+      header?: {
+        authorization?: string | null
       }
       path?: never
       cookie?: never
@@ -815,8 +832,8 @@ export interface operations {
   delete_profile_profiles__profile_id__delete: {
     parameters: {
       query?: never
-      header: {
-        authorization: string
+      header?: {
+        authorization?: string | null
       }
       path: {
         profile_id: number
@@ -846,8 +863,8 @@ export interface operations {
   modify_profile_profiles__profile_id__patch: {
     parameters: {
       query?: never
-      header: {
-        authorization: string
+      header?: {
+        authorization?: string | null
       }
       path: {
         profile_id: number
@@ -885,8 +902,8 @@ export interface operations {
       query: {
         canditate: string
       }
-      header: {
-        authorization: string
+      header?: {
+        authorization?: string | null
       }
       path?: never
       cookie?: never
@@ -916,8 +933,8 @@ export interface operations {
   modify_nik_user_nik__nik__put: {
     parameters: {
       query?: never
-      header: {
-        authorization: string
+      header?: {
+        authorization?: string | null
       }
       path: {
         nik: string
@@ -958,8 +975,8 @@ export interface operations {
   rm_nik_user_nik_delete: {
     parameters: {
       query?: never
-      header: {
-        authorization: string
+      header?: {
+        authorization?: string | null
       }
       path?: never
       cookie?: never
@@ -1018,8 +1035,8 @@ export interface operations {
   get_me_me_get: {
     parameters: {
       query?: never
-      header: {
-        authorization: string
+      header?: {
+        authorization?: string | null
       }
       path?: never
       cookie?: never
@@ -1042,6 +1059,26 @@ export interface operations {
         }
         content: {
           'application/json': components['schemas']['HTTPValidationError']
+        }
+      }
+    }
+  }
+  hello_world_hello_world_get: {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      /** @description Successful Response */
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': unknown
         }
       }
     }

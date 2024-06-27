@@ -1,4 +1,7 @@
-import type {ActorRefFrom, PromiseActorLogic} from 'xstate'
+import {
+  type ActorRefFrom,
+  type PromiseActorLogic,
+} from 'xstate'
 import type {api} from '../api.types'
 
 export function xfetch<

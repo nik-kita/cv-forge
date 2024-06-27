@@ -1,7 +1,7 @@
-import {fn_to_promise_logic} from '@/utils/x.fn-to-promise-logic.util'
-import {assign, setup} from 'xstate'
-import {_xfetch_config} from './globals.xfetch'
+import {assign, fromPromise, setup} from 'xstate'
+import {xfetch_config} from './globals.xfetch'
 import type {xfetch} from './types.xfetch'
+import {fn_to_promise_logic} from '@/utils/x.fn-to-promise-logic.util'
 
 export const machine = setup({
   types: {
@@ -10,52 +10,95 @@ export const machine = setup({
     output: {} as xfetch.Output,
   },
   actors: {
-    api: fn_to_promise_logic<
-      (
-        ctx: xfetch.Context,
-      ) => ReturnType<xfetch.Context['api']>
-    >(async ctx => {
-      return ctx.api(ctx.payload)
-    }),
+    fetch: fn_to_promise_logic(
+      async (context: xfetch.Context) => {
+        const res = await fetch(
+          `${context.url}${context.payload.endpoint}`,
+          {
+            method: context.payload.method,
+            body:
+              context.payload.body &&
+              JSON.stringify(context.payload.body),
+            headers: {
+              'Content-Type': 'application/json',
+              ...(context.payload.headers || {}),
+              ...(context.is_public && {
+                Authorization: `Bearer ${context.get_access_token()}`,
+              }),
+            },
+          },
+        )
+
+        if (res.ok) {
+          if (
+            res.headers
+              .get('content-type')
+              ?.includes('application/json')
+          ) {
+            return res.json()
+          } else {
+            return res.text()
+          }
+        }
+
+        throw res
+      },
+    ),
   },
 }).createMachine({
   id: 'xfetch',
-  initial: 'Start',
   output({context: {output}}) {
-    if (!output) return {ok: false, error: 'no output'}
+    if (!output) throw {ok: false, error: 'no output'}
     return output
   },
+  initial: 'Init',
   states: {
-    Start: {
-      invoke: {
-        src: 'api',
-        input({context}) {
-          return context
+    Init: {
+      always: [
+        {
+          guard: ({context: {is_public}}) => is_public,
+          target: 'Public',
         },
+        {
+          target: 'Private',
+        },
+      ],
+    },
+    Private: {},
+    Public: {
+      invoke: {
+        src: 'fetch',
+        input: ({context}) => context,
+
         onDone: {
-          target: 'Finish',
+          target: 'Done',
           actions: assign({
-            output: ({event}) => {
-              return {ok: true, success: event.output}
-            },
+            output: ({event}) => ({
+              ok: true,
+              success: event.output,
+            }),
           }),
+        },
+        onError: {
+          target: 'Done',
         },
       },
     },
-    Finish: {
+    Done: {
       type: 'final',
     },
   },
   context({input}) {
     return {
-      api: input.api,
       payload: input.payload,
+      url: input.__override__?._url || xfetch_config.url,
+      is_public: input.is_public || false,
       get_refresh_token:
-        input._get_refresh_token ||
-        _xfetch_config.get_refresh_token,
+        input.__override__?._get_refresh_token ||
+        xfetch_config.get_refresh_token,
       get_access_token:
-        input._get_access_token ||
-        _xfetch_config.get_access_token,
+        input.__override__?._get_access_token ||
+        xfetch_config.get_access_token,
     }
   },
 })

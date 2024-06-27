@@ -6,12 +6,13 @@ import type {api} from '../api.types'
 
 export namespace xfetch {
   export type Input = {
-    api: (
-      payload: api.Req<any, any>,
-    ) => Promise<api_deprecated.Res<any, any>>
-    payload: api.Req<any, any>
-    _get_access_token?: () => string | null
-    _get_refresh_token?: () => string | null
+    payload: Partial<api.Req<any, any>>
+    is_public?: true
+    __override__?: {
+      _url?: string
+      _get_access_token?: () => string | null
+      _get_refresh_token?: () => string | null
+    }
   }
   export type Output =
     | {
@@ -31,10 +32,12 @@ export namespace xfetch {
             >
           | unknown
       }
-  export type Context = Pick<Input, 'api' | 'payload'> & {
-    get_refresh_token: typeof get_refresh_token
-    get_access_token: typeof get_access_token
-  } & {
-    output?: Output
-  }
+  export type Context = Pick<Input, 'payload'> &
+    OmitReplace<Input, {is_public: boolean}> & {
+      get_refresh_token: typeof get_refresh_token
+      get_access_token: typeof get_access_token
+    } & {
+      output?: Output
+      url: string
+    }
 }
