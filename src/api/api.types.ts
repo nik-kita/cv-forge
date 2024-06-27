@@ -43,5 +43,8 @@ export namespace api {
       }
     ) ?
       {qs: Q['parameters']['query']}
-    : {})
+    : {}) & {
+      method: T
+      endpoint: U
+    }
 }
