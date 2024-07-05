@@ -1,3 +1,5 @@
 {
-  "vue.server.hybridMode": true
+  "vue.server.hybridMode": true,
+  "editor.stickyScroll.maxLineCount": 20,
+  "editor.stickyScroll.defaultModel": "foldingProviderModel"
 }
