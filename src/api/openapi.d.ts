@@ -417,6 +417,11 @@ export interface components {
       /** Detail */
       detail?: components['schemas']['ValidationError'][]
     }
+    /** HelloWorldRes */
+    HelloWorldRes: {
+      /** Message */
+      message: string
+    }
     /** LanguageReq */
     LanguageReq: {
       /** Language */
@@ -1216,7 +1221,7 @@ export interface operations {
           ]: unknown
         }
         content: {
-          'application/json': unknown
+          'application/json': components['schemas']['HelloWorldRes']
         }
       }
     }
