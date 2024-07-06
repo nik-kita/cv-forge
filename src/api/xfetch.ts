@@ -1,3 +1,4 @@
+import { url_param_replacer } from '@/utils/url-params-replacer.util'
 import { fn_to_promise_logic } from '@/utils/x.fn-to-promise-logic.util'
 import {
   assertEvent,
@@ -12,16 +13,19 @@ import type { api } from './api.namespace'
 type OutputSuccess<
   T = unknown,
 > = {
+  _: 'success'
   success: T
 }
 type OutputException<
   T = unknown,
 > = {
+  _: 'exception'
   exception: T
 }
 type OutputError<
   T = unknown,
 > = {
+  _: 'error'
   error: T
 }
 
@@ -154,7 +158,7 @@ export namespace xfetch {
             ) => {
               const res =
                 await fetch(
-                  `${'http://localhost:3000'}${context.payload.path}`,
+                  `${'http://localhost:3000'}${context.payload.params ? url_param_replacer(context.payload.path, context.payload.params) : context.payload.path}`,
                   {
                     method:
                       context
@@ -194,11 +198,13 @@ export namespace xfetch {
                     ]()
 
                   return {
+                    _: 'success',
                     success:
                       data,
                   } satisfies xfetch.Output
                 } else {
                   return {
+                    _: 'success',
                     success:
                       null,
                   } satisfies xfetch.Output
@@ -215,6 +221,7 @@ export namespace xfetch {
                   await res.json()
 
                 throw {
+                  _: 'exception',
                   exception:
                     data,
                 } satisfies xfetch.Output
@@ -373,6 +380,7 @@ export namespace xfetch {
                       type: 'assign_output_error',
                       params:
                         {
+                          _: 'error',
                           error:
                             'Too long waiting for refresh',
                         },
@@ -394,6 +402,7 @@ export namespace xfetch {
                           type: 'assign_output_error',
                           params:
                             {
+                              _: 'error',
                               error:
                                 'Failed to refresh',
                             },
@@ -415,6 +424,7 @@ export namespace xfetch {
                     params: ({
                       event,
                     }) => ({
+                      _: 'success',
                       success:
                         event.output,
                     }),
@@ -519,6 +529,7 @@ export namespace xfetch {
                     params: ({
                       event,
                     }) => ({
+                      _: 'success',
                       success:
                         event.output,
                     }),
@@ -554,6 +565,7 @@ export namespace xfetch {
                         ({
                           event,
                         }) => ({
+                          _: 'error',
                           error:
                             event.error,
                         }),

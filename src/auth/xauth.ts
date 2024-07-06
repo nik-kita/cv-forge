@@ -1,8 +1,9 @@
 import type { api } from '@/api/api.namespace'
+import { xapi } from '@/api/xapi'
 import type { Ref } from 'vue'
 import {
+  assertEvent,
   assign,
-  createMachine,
   setup,
   type AnyActorRef,
 } from 'xstate'
@@ -22,18 +23,20 @@ export namespace xauth {
       update_refresh_token: (
         token: string | null,
       ) => void
-      get_access_refresh_tokens: () => {
-        access_token:
-          | string
-          | null
-        refresh_token:
-          | string
-          | null
-      }
+      get_access_token: () =>
+        | string
+        | null
+      get_refresh_token: () =>
+        | string
+        | null
     }
   export type Events =
     | {
         type: 'auth.sign-in'
+        payload: api.Req<
+          'post',
+          '/auth/sign-in'
+        >['body']
       }
     | {
         type: 'auth.logout'
@@ -155,9 +158,31 @@ export namespace xauth {
           },
       },
       actors: {
-        xfetch: createMachine(
+        api_refresh: xapi(
           {
-            /* ... */
+            method: 'post',
+            path: '/auth/refresh',
+          },
+          {
+            is_private: false,
+          },
+        ),
+        'api_sign-in': xapi(
+          {
+            method: 'post',
+            path: '/auth/sign-in',
+          },
+          {
+            is_private: false,
+          },
+        ),
+        api_logout: xapi(
+          {
+            method: 'post',
+            path: '/auth/logout',
+          },
+          {
+            is_private: false,
           },
         ),
       },
@@ -202,19 +227,16 @@ export namespace xauth {
                   token,
                 )
             },
-          get_access_refresh_tokens:
-            () => {
-              return {
-                access_token:
-                  localStorage.getItem(
-                    'access_token',
-                  ),
-                refresh_token:
-                  localStorage.getItem(
-                    'refresh_token',
-                  ),
-              }
-            },
+          get_access_token:
+            () =>
+              localStorage.getItem(
+                'access_token',
+              ),
+          get_refresh_token:
+            () =>
+              localStorage.getItem(
+                'refresh_token',
+              ),
         }
       },
       initial: 'Init',
@@ -263,7 +285,7 @@ export namespace xauth {
                     target:
                       'Idle',
                   },
-                  src: 'xfetch',
+                  src: 'api_logout',
                 },
               },
             Processing_refresh:
@@ -288,7 +310,16 @@ export namespace xauth {
 
                 invoke: {
                   id: 'refresh',
-                  input: {},
+                  input: ({
+                    context,
+                  }) => {
+                    return {
+                      body: {
+                        refresh_token:
+                          context.get_refresh_token()!,
+                      },
+                    }
+                  },
                   onDone: {
                     target:
                       'Idle',
@@ -335,7 +366,7 @@ export namespace xauth {
                       },
                     ],
                   },
-                  src: 'xfetch',
+                  src: 'api_refresh',
                 },
               },
           },
@@ -354,7 +385,27 @@ export namespace xauth {
               {
                 invoke: {
                   id: 'sign-in',
-                  input: {},
+                  input: ({
+                    context,
+                    event,
+                  }) => {
+                    assertEvent(
+                      event,
+                      'auth.sign-in',
+                    )
+                    return {
+                      body: {
+                        auth_provider:
+                          event
+                            .payload
+                            .auth_provider,
+                        credential:
+                          event
+                            .payload
+                            .credential,
+                      },
+                    }
+                  },
                   onDone: {
                     target:
                       '#xauth.User',
@@ -410,7 +461,7 @@ export namespace xauth {
                     target:
                       'Idle',
                   },
-                  src: 'xfetch',
+                  src: 'api_sign-in',
                 },
               },
           },
