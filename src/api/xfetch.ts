@@ -4,6 +4,7 @@ import {
   createMachine,
   not,
   setup,
+  type AnyActorRef,
   type ErrorActorEvent,
 } from 'xstate'
 
@@ -28,30 +29,81 @@ export namespace xfetch {
     | OutputSuccess
     | OutputException
     | OutputError
-  export type Input =
-    | {
-        is_private: true
-        is_refresh_processing: boolean
-      }
-    | {
-        is_private?: false
-      }
+  export type Input = {
+    is_private?: boolean
+  }
   export type Context = {
+    xauth?: AnyActorRef
     is_private: boolean
     is_refresh_processing: boolean
     output?: Output
     is_first_private_request_attempt: boolean
   }
 
+  export type Events =
+    | {
+        type: 'auth.subscribe_on_refresh_update'
+        payload: {
+          xfetch: AnyActorRef
+        }
+      }
+    | {
+        type: 'auth.unauthorized'
+      }
+    | {
+        type: 'xfetch.refresh.success'
+      }
+    | {
+        type: 'xfetch.refresh.fail'
+      }
+    | ErrorActorEvent<
+        OutputException,
+        'fetch'
+      >
   export const machine =
     setup({
       types: {
+        events: {} as Events,
         input: {} as Input,
         context:
           {} as Context,
         output: {} as Output,
       },
       actions: {
+        notify_unauthorized:
+          ({
+            context: {
+              xauth,
+            },
+          }) => {
+            if (!xauth) {
+              throw new Error(
+                'xauth actor is not found in the system',
+              )
+            }
+            xauth.send({
+              type: 'auth.unauthorized',
+            } as Events)
+          },
+        subscribe_on_refresh_update:
+          ({
+            context: {
+              xauth,
+            },
+            self,
+          }) => {
+            if (!xauth) {
+              throw new Error(
+                'xauth actor is not found in the system',
+              )
+            }
+            xauth.send({
+              type: 'auth.subscribe_on_refresh_update',
+              payload: {
+                xfetch: self,
+              },
+            } satisfies Events)
+          },
         mark_first_private_request_attempt_as_complete:
           assign({
             is_first_private_request_attempt:
@@ -82,10 +134,6 @@ export namespace xfetch {
           }),
       },
       actors: {
-        refresh_update_subscription:
-          createMachine({
-            /* ... */
-          }),
         fetch: createMachine({
           /* ... */
         }),
@@ -143,26 +191,32 @@ export namespace xfetch {
       context: function ({
         input,
       }) {
-        if (
-          input.is_private
-        ) {
-          return {
-            is_private: true,
-            is_refresh_processing:
-              input.is_refresh_processing,
-            is_first_private_request_attempt:
-              true,
-          }
-        } else {
-          return {
-            is_private: false,
-            is_refresh_processing:
-              false,
-            is_first_private_request_attempt:
-              false,
-          }
+        return {
+          is_first_private_request_attempt:
+            false,
+          is_private:
+            input.is_private ??
+            false,
+          is_refresh_processing:
+            false,
         }
       },
+      entry: assign({
+        xauth: ({
+          system,
+        }) => {
+          const xauth =
+            system.get(
+              'xauth',
+            )!
+          console.assert(
+            !!xauth,
+            'xauth actor is not found in the system',
+          )
+
+          return xauth
+        },
+      }),
       id: 'xfetch',
       initial: 'Process_auth',
       states: {
@@ -190,9 +244,14 @@ export namespace xfetch {
                 {
                   target:
                     'Wait_for_refresh',
-                  actions: {
-                    type: 'mark_first_private_request_attempt_as_complete',
-                  },
+                  actions: [
+                    {
+                      type: 'subscribe_on_refresh_update',
+                    },
+                    {
+                      type: 'mark_first_private_request_attempt_as_complete',
+                    },
+                  ],
                   guard: {
                     type: 'is_refresh_processing',
                   },
@@ -219,26 +278,26 @@ export namespace xfetch {
                     },
                   },
                 },
-                invoke: {
-                  id: 'refresh_update_subscription',
-                  input: {},
-                  onDone: {
-                    target:
-                      'Fetching',
-                  },
-                  onError: {
-                    target:
-                      '#xfetch.Fail',
-                    actions: {
-                      type: 'assign_output_error',
-                      params:
+                on: {
+                  'xfetch.refresh.success':
+                    {
+                      target:
+                        'Fetching',
+                    },
+                  'xfetch.refresh.fail':
+                    {
+                      target:
+                        '#xfetch.Fail',
+                      actions:
                         {
-                          error:
-                            'Failed to refresh',
+                          type: 'assign_output_error',
+                          params:
+                            {
+                              error:
+                                'Failed to refresh',
+                            },
                         },
                     },
-                  },
-                  src: 'refresh_update_subscription',
                 },
               },
             Fetching: {
@@ -292,17 +351,12 @@ export namespace xfetch {
                         ({
                           event,
                         }) => {
-                          const ev =
-                            event as ErrorActorEvent<
-                              OutputException,
-                              'fetch'
-                            >
                           assertEvent(
-                            ev,
+                            event,
                             'xstate.error.actor.fetch',
                           )
 
-                          return ev.error
+                          return event.error
                         },
                     },
                     guard: {
@@ -312,25 +366,28 @@ export namespace xfetch {
                   {
                     target:
                       'Wait_for_refresh',
-                    actions: {
-                      type: 'mark_first_private_request_attempt_as_complete',
-                    },
+                    actions: [
+                      {
+                        type: 'notify_unauthorized',
+                      },
+                      {
+                        type: 'subscribe_on_refresh_update',
+                      },
+                      {
+                        type: 'mark_first_private_request_attempt_as_complete',
+                      },
+                    ],
                     guard: {
                       type: 'is_unauthorized',
                       params:
                         ({
                           event,
                         }) => {
-                          const ev =
-                            event as ErrorActorEvent<
-                              OutputException,
-                              'fetch'
-                            >
                           assertEvent(
-                            ev,
+                            event,
                             'xstate.error.actor.fetch',
                           )
-                          return ev.error
+                          return event.error
                         },
                     },
                   },
