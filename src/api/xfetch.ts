@@ -1,12 +1,13 @@
+import { fn_to_promise_logic } from '@/utils/x.fn-to-promise-logic.util'
 import {
   assertEvent,
   assign,
-  createMachine,
   not,
   setup,
   type AnyActorRef,
   type ErrorActorEvent,
 } from 'xstate'
+import type { api } from './api.namespace'
 
 type OutputSuccess<
   T = unknown,
@@ -31,13 +32,25 @@ export namespace xfetch {
     | OutputError
   export type Input = {
     is_private?: boolean
+    exception_in_body?: boolean
+    res_as?: null | 'json'
+    payload: api.Req<
+      api.Method,
+      api.Path
+    >
   }
   export type Context = {
+    exception_in_body: boolean
+    res_as: 'json' | null
+    payload: Input['payload']
     xauth?: AnyActorRef
     is_private: boolean
     is_refresh_processing: boolean
     output?: Output
     is_first_private_request_attempt: boolean
+    get_access_token: () =>
+      | string
+      | null
   }
 
   export type Events =
@@ -134,9 +147,82 @@ export namespace xfetch {
           }),
       },
       actors: {
-        fetch: createMachine({
-          /* ... */
-        }),
+        fetch:
+          fn_to_promise_logic(
+            async (
+              context: xfetch.Context,
+            ) => {
+              const res =
+                await fetch(
+                  `${'http://localhost:3000'}${context.payload.path}`,
+                  {
+                    method:
+                      context
+                        .payload
+                        .method,
+                    body:
+                      context
+                        .payload
+                        .body &&
+                      JSON.stringify(
+                        context
+                          .payload
+                          .body,
+                      ),
+                    headers: {
+                      'Content-Type':
+                        'application/json',
+                      ...(context
+                        .payload
+                        .headers ||
+                        {}),
+                      ...(context.is_private && {
+                        Authorization: `Bearer ${context.get_access_token()}`,
+                      }),
+                    },
+                  },
+                )
+
+              if (res.ok) {
+                if (
+                  context.res_as
+                ) {
+                  const data =
+                    await res[
+                      context
+                        .res_as
+                    ]()
+
+                  return {
+                    success:
+                      data,
+                  } satisfies xfetch.Output
+                } else {
+                  return {
+                    success:
+                      null,
+                  } satisfies xfetch.Output
+                }
+              } else if (
+                context.exception_in_body ||
+                [
+                  401, 403,
+                ].includes(
+                  res.status,
+                )
+              ) {
+                const data =
+                  await res.json()
+
+                throw {
+                  exception:
+                    data,
+                } satisfies xfetch.Output
+              }
+
+              throw res
+            },
+          ),
       },
       guards: {
         is_private:
@@ -192,6 +278,21 @@ export namespace xfetch {
         input,
       }) {
         return {
+          payload:
+            input.payload,
+          res_as:
+            input.res_as ===
+            undefined
+              ? 'json'
+              : input.res_as,
+          exception_in_body:
+            input.exception_in_body ??
+            true,
+          get_access_token:
+            () =>
+              localStorage.getItem(
+                'access_token',
+              ),
           is_first_private_request_attempt:
             false,
           is_private:
@@ -303,7 +404,9 @@ export namespace xfetch {
             Fetching: {
               invoke: {
                 id: 'fetch',
-                input: {},
+                input: ({
+                  context,
+                }) => context,
                 onDone: {
                   target:
                     '#xfetch.Success',
@@ -405,7 +508,9 @@ export namespace xfetch {
             Fetching: {
               invoke: {
                 id: 'fetch',
-                input: {},
+                input: ({
+                  context,
+                }) => context,
                 onDone: {
                   target:
                     '#xfetch.Success',
