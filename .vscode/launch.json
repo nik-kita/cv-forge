@@ -10,6 +10,14 @@
       "name": "http://localhost:5173",
       "url": "http://localhost:5173",
       "webRoot": "${workspaceFolder}",
+      "internalConsoleOptions": "neverOpen"
+    },
+    {
+      "command": "npx vitest -t 'xapi-xauth-integration'",
+      "name": "test::xapi-xauth-integration",
+      "request": "launch",
+      "type": "node-terminal",
+      "internalConsoleOptions": "neverOpen"
     }
   ]
 }

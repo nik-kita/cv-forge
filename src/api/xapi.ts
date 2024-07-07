@@ -132,13 +132,11 @@ export function xapi<
       await waitFor(
         actor,
         s =>
-          s.status !==
-          'active',
+          s.status === 'done',
       )
 
     const output =
       snapshot.output
-
     if (
       output?._ === 'success'
     ) {
