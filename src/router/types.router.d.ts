@@ -1,11 +1,9 @@
 import 'vue-router'
+import type { NavEvent } from './nav-event.type'
 
 declare module 'vue-router' {
   interface RouteMeta {
-    x_event:
-      | 'nav.Home'
-      | 'nav.ProfilesList'
-      | 'nav.SingleProfile'
+    x_event: NavEvent['type']
     public: boolean
   }
 }

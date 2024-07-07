@@ -5,16 +5,23 @@
   "version": "0.2.0",
   "configurations": [
     {
+      "command": "npx vitest -t 'xrouter'",
+      "name": "xrouter",
+      "request": "launch",
+      "type": "node-terminal",
+      "internalConsoleOptions": "neverOpen"
+    },
+    {
       "type": "chrome",
       "request": "launch",
-      "name": "http://localhost:5173",
+      "name": "e2e http://localhost:5173",
       "url": "http://localhost:5173",
       "webRoot": "${workspaceFolder}",
       "internalConsoleOptions": "neverOpen"
     },
     {
       "command": "npx vitest -t 'xapi-xauth-integration'",
-      "name": "test::xapi-xauth-integration",
+      "name": "xapi-xauth-integration",
       "request": "launch",
       "type": "node-terminal",
       "internalConsoleOptions": "neverOpen"

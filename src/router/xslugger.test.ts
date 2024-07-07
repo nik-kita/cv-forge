@@ -13,7 +13,7 @@ import {
   createActor,
   waitFor,
 } from 'xstate'
-import { machine } from './xslugger'
+import { xslugger } from './xslugger'
 
 describe('xslugger', () => {
   it.each([
@@ -121,9 +121,9 @@ describe('xslugger', () => {
         })
       const before_each_router_mock =
         vi.fn(async to => {
-          const xslugger =
+          const xslugger_actor =
             createActor(
-              machine,
+              xslugger.machine,
               {
                 input: {
                   to,
@@ -131,15 +131,15 @@ describe('xslugger', () => {
                 },
               },
             )
-          xslugger.start()
+          xslugger_actor.start()
           await waitFor(
-            xslugger,
+            xslugger_actor,
             s =>
               s.status ===
               'done',
           )
           const snapshot =
-            xslugger.getSnapshot()
+            xslugger_actor.getSnapshot()
           expect(
             snapshot.output,
           ).toMatchObject(

@@ -56,6 +56,39 @@ declare global {
       typeof Promise
     >[0]
   >[1]
-}
 
+  namespace x {
+    type SuccessDoneActorEv<
+      Id extends string,
+      T,
+    > = OmitReplace<
+      DoneActorEvent<T>,
+      {
+        type: `xstate.done.actor.${Id}`
+      }
+    >
+    type FailDoneActorEv<
+      Id extends string,
+      T,
+    > = OmitReplace<
+      ErrorActorEvent<T>,
+      {
+        type: `xstate.error.actor.${Id}`
+      }
+    >
+    type DoneActorEv<
+      Id extends string,
+      T,
+    > =
+      | SuccessDoneActorEv<
+          Id,
+          T
+        >
+      | FailDoneActorEv<Id, T>
+
+    type InitEv = {
+      type: 'xstate.init'
+    }
+  }
+}
 export {}
