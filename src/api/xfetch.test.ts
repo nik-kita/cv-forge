@@ -8,6 +8,10 @@ it('xfetch', async () => {
     {
       input: {
         is_private: false,
+        payload: {
+          method: 'get',
+          path: '/hello-world',
+        },
       },
     },
   )

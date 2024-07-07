@@ -1,14 +1,10 @@
-<script setup lang="ts">
-withDefaults(
-  defineProps<{
-    title: string
-  }>(),
-  {
-    title: 'ok',
-  },
-)
-</script>
+<script
+  setup
+  lang="ts"
+></script>
 
 <template>
-  <button>{{ title }}</button>
+  <button>
+    <slot>ok</slot>
+  </button>
 </template>

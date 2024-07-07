@@ -27,13 +27,4 @@ export const Default: Story =
           })
       },
     }),
-    args: {},
-  }
-
-export const HelloWorld: Story =
-  {
-    name: 'hello world',
-    args: {
-      title: 'hello world',
-    },
   }
