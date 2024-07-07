@@ -137,18 +137,20 @@ export namespace xrouter {
             false,
         }
       },
-      entry:
-        'integrate_router',
       id: 'xrouter',
-      initial: 'Idle',
+      type: 'parallel',
       on: {
         nav: {
           target:
-            '#xrouter._Processing_navigation',
+            '#xrouter.Computation.Processing',
         },
         'nav.Home': {
           target:
             '#xrouter.Pages.Home',
+        },
+        'nav.About': {
+          target:
+            '#xrouter.Pages.About',
         },
         'nav.SingleProfile': {
           target:
@@ -159,51 +161,65 @@ export namespace xrouter {
             '#xrouter.Pages.ProfilesList',
         },
       },
+      entry: {
+        type: 'integrate_router',
+      },
       states: {
-        Idle: {},
-        _Processing_navigation:
-          {
-            invoke: {
-              input({
-                event,
-                context,
-              }) {
-                assertEvent(
+        Computation: {
+          initial: 'Idle',
+          states: {
+            Idle: {},
+            Processing: {
+              invoke: {
+                id: 'xslugger',
+                input({
                   event,
-                  'nav',
-                )
+                  context,
+                }) {
+                  assertEvent(
+                    event,
+                    'nav',
+                  )
 
-                return {
-                  to: event.to,
-                  user: context.get_user(),
-                }
-              },
-              onDone: {
-                target:
-                  'Idle',
-
-                actions: {
-                  type: 'raise_navigate',
+                  return {
+                    to: event.to,
+                    user: context.get_user(),
+                  }
                 },
+                onDone: {
+                  actions:
+                    'raise_navigate',
+                  target:
+                    'Idle',
+                },
+                src: 'xslugger',
               },
-              src: 'xslugger',
-              id: 'xslugger',
             },
           },
+        },
         Pages: {
-          initial: 'Home',
+          initial: 'Idle',
           states: {
+            Idle: {},
             Home: {
-              entry:
-                'navigate',
+              entry: {
+                type: 'navigate',
+              },
             },
             SingleProfile: {
-              entry:
-                'navigate',
+              entry: {
+                type: 'navigate',
+              },
             },
             ProfilesList: {
-              entry:
-                'navigate',
+              entry: {
+                type: 'navigate',
+              },
+            },
+            About: {
+              entry: {
+                type: 'navigate',
+              },
             },
           },
         },
