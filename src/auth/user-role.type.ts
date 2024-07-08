@@ -1,4 +1,4 @@
-export type UserRole =
+export type ViewerRole =
   | 'owner'
-  | 'user::viewer'
-  | 'guest::viewer'
+  | 'user'
+  | 'guest'

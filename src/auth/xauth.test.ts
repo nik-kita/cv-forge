@@ -1,7 +1,20 @@
-import { it } from 'vitest'
+import {
+  beforeEach,
+  it,
+} from 'vitest'
 import { xauth } from './xauth'
 import { createActor } from 'xstate'
 import { ref } from 'vue'
+import {
+  createPinia,
+  setActivePinia,
+} from 'pinia'
+
+beforeEach(() => {
+  setActivePinia(
+    createPinia(),
+  )
+})
 
 it('xauth', async () => {
   const actor = createActor(
@@ -9,7 +22,7 @@ it('xauth', async () => {
     {
       input: {
         is_user: ref(false),
-        username: ref(null),
+        nik: ref(null),
       },
     },
   )

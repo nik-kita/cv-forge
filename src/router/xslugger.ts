@@ -1,23 +1,22 @@
-import type { User } from '@/auth/user.type'
+import { use_app_store } from '@/app.store'
+import type { ViewerRole } from '@/auth/user-role.type'
 import type { RouteLocationNormalized } from 'vue-router'
 import {
   assign,
   setup,
 } from 'xstate'
 import type { NavEvent } from './nav-event.type'
-import type { UserRole } from '@/auth/user-role.type'
 
 export namespace xslugger {
   export type Input = {
     to: RouteLocationNormalized
-    user?: User
   }
   export type Output =
     | {
         ok: true
         path: string
         x_event: NavEvent['type']
-        role: UserRole
+        role: ViewerRole
       }
     | {
         ok: false
@@ -27,7 +26,6 @@ export namespace xslugger {
       }
   export type Context = {
     to: RouteLocationNormalized
-    user?: User
     output?: Output
   }
   export const machine =
@@ -51,7 +49,7 @@ export namespace xslugger {
                 context.to
                   .meta
                   .x_event,
-              role: 'guest::viewer',
+              role: 'guest',
             }) as const,
         }),
         generate_output:
@@ -88,12 +86,13 @@ export namespace xslugger {
             output({
               context,
             }) {
+              const app_store =
+                use_app_store()
               if (
                 !context
                   .output
                   ?.path ||
-                !context.user
-                  ?.nik
+                !app_store.nik
               ) {
                 throw new Error(
                   'This action should not be called if either path or nik is missing',
@@ -102,7 +101,7 @@ export namespace xslugger {
 
               return {
                 ...context.output,
-                path: `${context.output.path}/${context.user.nik}`,
+                path: `${context.output.path}/${app_store.nik}`,
               }
             },
           }),
@@ -111,40 +110,28 @@ export namespace xslugger {
         is_nik_slug_present:
           function ({
             context,
-            event,
           }) {
             return !!context
               .to.params.nik
           },
-        is_user: function ({
-          context,
-          event,
-        }) {
-          return !!context.user
+        is_user: function () {
+          return !!use_app_store()
+            .user
         },
         has_user_nik:
-          function ({
-            context,
-            event,
-          }) {
-            if (
-              !context.user
-            ) {
-              throw new Error(
-                'This guard should not be called if user is missing',
-              )
-            }
-            return !!context
-              .user.nik
+          function () {
+            const app_store =
+              use_app_store()
+            return !!app_store.nik
           },
         is_niks_equal:
           function ({
             context,
-            event,
           }) {
+            const app_store =
+              use_app_store()
             if (
-              !context.user
-                ?.nik ||
+              !app_store.nik ||
               !context.to
                 .params.nik
             ) {
@@ -154,15 +141,13 @@ export namespace xslugger {
             }
 
             return (
-              context.user
-                .nik ===
+              app_store.nik ===
               context.to
                 .params.nik
             )
           },
         is_public: function ({
           context,
-          event,
         }) {
           return context.to
             .meta.public
@@ -171,7 +156,9 @@ export namespace xslugger {
     }).createMachine({
       context({ input }) {
         return {
-          ...input,
+          to: input.to,
+          user: use_app_store()
+            .user,
         }
       },
       output({ context }) {
@@ -279,7 +266,7 @@ export namespace xslugger {
                           always:
                             {
                               target:
-                                '#nik_slugger.User::viewer',
+                                '#nik_slugger.User',
                             },
                         },
                     },
@@ -288,7 +275,7 @@ export namespace xslugger {
                   {
                     always: {
                       target:
-                        '#nik_slugger.User::viewer',
+                        '#nik_slugger.User',
                     },
                   },
               },
@@ -296,7 +283,7 @@ export namespace xslugger {
             Guest: {
               always: {
                 target:
-                  '#nik_slugger.Guest::viewer',
+                  '#nik_slugger.Guest',
               },
             },
           },
@@ -364,7 +351,7 @@ export namespace xslugger {
                             },
                             {
                               target:
-                                '#nik_slugger.User::viewer',
+                                '#nik_slugger.User',
                             },
                           ],
                       },
@@ -373,7 +360,7 @@ export namespace xslugger {
                 Guest: {
                   always: {
                     target:
-                      '#nik_slugger.Guest::viewer',
+                      '#nik_slugger.Guest',
                   },
                 },
               },
@@ -408,14 +395,14 @@ export namespace xslugger {
                 Guest: {
                   always: {
                     target:
-                      '#nik_slugger.Guest::forbidden',
+                      '#nik_slugger.Forbidden',
                   },
                 },
               },
             },
           },
         },
-        'Guest::viewer': {
+        Guest: {
           type: 'final',
           entry: {
             type: 'generate_output',
@@ -428,7 +415,7 @@ export namespace xslugger {
                   ?.path
               ) {
                 throw new Error(
-                  'Guest::viewer => Path is missing',
+                  'Guest => Path is missing',
                 )
               }
 
@@ -438,7 +425,7 @@ export namespace xslugger {
                   context.to
                     .meta
                     .x_event,
-                role: 'guest::viewer',
+                role: 'guest',
                 path: context
                   .output
                   .path,
@@ -446,7 +433,7 @@ export namespace xslugger {
             },
           },
         },
-        'User::viewer': {
+        User: {
           type: 'final',
           entry: {
             type: 'generate_output',
@@ -459,13 +446,13 @@ export namespace xslugger {
                   ?.path
               ) {
                 throw new Error(
-                  'User::viewer => Path is missing',
+                  'User => Path is missing',
                 )
               }
 
               return {
                 ok: true,
-                role: 'user::viewer',
+                role: 'user',
                 x_event:
                   context.to
                     .meta
@@ -490,7 +477,7 @@ export namespace xslugger {
                   ?.path
               ) {
                 throw new Error(
-                  'User::viewer => Path is missing',
+                  'User => Path is missing',
                 )
               }
 
@@ -508,7 +495,7 @@ export namespace xslugger {
             },
           },
         },
-        'Guest::forbidden': {
+        Forbidden: {
           type: 'final',
           entry: {
             type: 'generate_output',

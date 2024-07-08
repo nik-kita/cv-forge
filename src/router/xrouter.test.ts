@@ -2,12 +2,24 @@ import {
   describe,
   expect,
   it,
+  beforeEach,
 } from 'vitest'
 import { createActor } from 'xstate'
 import { init_router } from './mod.router'
 import { xrouter } from './xrouter'
+import { _override_app_stuff } from '@/app.stuff'
+import {
+  createPinia,
+  setActivePinia,
+} from 'pinia'
+import { use_app_store } from '@/app.store'
 
 describe('xrouter', () => {
+  beforeEach(() => {
+    setActivePinia(
+      createPinia(),
+    )
+  })
   it.each([
     {
       link: '/',
@@ -30,6 +42,8 @@ describe('xrouter', () => {
       get_user,
       expected,
     }) => {
+      use_app_store().user =
+        get_user()
       const router =
         init_router()
       const xrouter_actor =
@@ -38,7 +52,6 @@ describe('xrouter', () => {
           {
             input: {
               router,
-              get_user,
             },
           },
         )

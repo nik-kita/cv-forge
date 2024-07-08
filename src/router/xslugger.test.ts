@@ -1,4 +1,5 @@
 import {
+  beforeEach,
   describe,
   expect,
   it,
@@ -14,8 +15,19 @@ import {
   waitFor,
 } from 'xstate'
 import { xslugger } from './xslugger'
+import { _override_app_stuff } from '@/app.stuff'
+import {
+  createPinia,
+  setActivePinia,
+} from 'pinia'
+import { use_app_store } from '@/app.store'
 
 describe('xslugger', () => {
+  beforeEach(() => {
+    setActivePinia(
+      createPinia(),
+    )
+  })
   it.each([
     {
       user: {},
@@ -27,7 +39,7 @@ describe('xslugger', () => {
       },
       expected: {
         path: '/test',
-        role: 'user::viewer',
+        role: 'user',
       },
     },
     {
@@ -41,7 +53,7 @@ describe('xslugger', () => {
       },
       expected: {
         path: '/test/zoro',
-        role: 'user::viewer',
+        role: 'user',
       },
     },
     {
@@ -66,7 +78,7 @@ describe('xslugger', () => {
       },
       expected: {
         path: '/test',
-        role: 'guest::viewer',
+        role: 'guest',
       },
     },
     {
@@ -104,6 +116,8 @@ describe('xslugger', () => {
       expected,
       user,
     }) => {
+      use_app_store().user =
+        user || null
       const router =
         createRouter({
           history:
@@ -127,7 +141,6 @@ describe('xslugger', () => {
               {
                 input: {
                   to,
-                  user,
                 },
               },
             )

@@ -1,4 +1,3 @@
-import type { User } from '@/auth/user.type'
 import type {
   RouteLocationNormalized,
   Router,
@@ -15,14 +14,8 @@ import { xslugger } from './xslugger'
 export namespace xrouter {
   export type Input = {
     router: Router
-    get_user: () =>
-      | User
-      | undefined
   }
   export type Context = {
-    get_user: () =>
-      | User
-      | undefined
     router: Router
     is_navigation_allowed: boolean
   }
@@ -98,7 +91,6 @@ export namespace xrouter {
           },
         raise_navigate: raise(
           function ({
-            context,
             event,
           }) {
             assertEvent(
@@ -131,8 +123,6 @@ export namespace xrouter {
         return {
           router:
             input.router,
-          get_user:
-            input.get_user,
           is_navigation_allowed:
             false,
         }
@@ -174,7 +164,6 @@ export namespace xrouter {
                 id: 'xslugger',
                 input({
                   event,
-                  context,
                 }) {
                   assertEvent(
                     event,
@@ -183,7 +172,6 @@ export namespace xrouter {
 
                   return {
                     to: event.to,
-                    user: context.get_user(),
                   }
                 },
                 onDone: {

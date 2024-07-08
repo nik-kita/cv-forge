@@ -3,7 +3,7 @@ import Button from '@/components/Button.vue'
 
 defineProps<{
   user?: {
-    username?: string
+    nik?: string
   } | null
 }>()
 </script>

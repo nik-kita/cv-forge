@@ -1,6 +1,7 @@
 import type { api } from '@/api/api.namespace'
 import { xapi } from '@/api/xapi'
-import type { Ref } from 'vue'
+import { use_app_store } from '@/app.store'
+import { use_app_stuff } from '@/app.stuff'
 import {
   assertEvent,
   assign,
@@ -8,28 +9,10 @@ import {
   type AnyActorRef,
 } from 'xstate'
 export namespace xauth {
-  export type Input = {
-    username: Ref<
-      string | null
-    >
-    is_user: Ref<boolean>
+  export type Input = {}
+  export type Context = {
+    xfetch_refresh_waiters: AnyActorRef[]
   }
-  export type Context =
-    Input & {
-      xfetch_refresh_waiters: AnyActorRef[]
-      update_access_token: (
-        token: string | null,
-      ) => void
-      update_refresh_token: (
-        token: string | null,
-      ) => void
-      get_access_token: () =>
-        | string
-        | null
-      get_refresh_token: () =>
-        | string
-        | null
-    }
   export type Events =
     | {
         type: 'auth.sign-in'
@@ -113,46 +96,46 @@ export namespace xauth {
           }),
         update_access_refresh_tokens:
           function (
-            {
-              context: {
-                update_access_token,
-                update_refresh_token,
-              },
-            },
+            _,
             params: {
               access_token: string
               refresh_token: string
             },
           ) {
-            update_access_token(
+            const app_stuff =
+              use_app_stuff()
+            app_stuff.set_access_token(
               params.access_token,
             )
-            update_refresh_token(
+            app_stuff.set_refresh_token(
               params.refresh_token,
             )
           },
-        update_username:
-          function (
-            { context },
-            params: {
-              username:
-                | string
-                | null
-            } | null,
+        update_nik: function (
+          _,
+          params: {
+            nik: string | null
+          } | null,
+        ) {
+          const app_store =
+            use_app_store()
+          if (
+            params &&
+            params.nik !==
+              app_store.nik
           ) {
-            if (params) {
-              context.username.value =
-                params.username
-            }
-          },
+            app_store.nik =
+              params.nik
+          }
+        },
         clean_access_refresh_tokens:
-          function ({
-            context,
-          }) {
-            context.update_access_token(
+          function () {
+            const app_stuff =
+              use_app_stuff()
+            app_stuff.set_access_token(
               null,
             )
-            context.update_refresh_token(
+            app_stuff.set_refresh_token(
               null,
             )
           },
@@ -187,56 +170,17 @@ export namespace xauth {
         ),
       },
       guards: {
-        is_user: function ({
-          context,
-        }) {
-          return context
-            .is_user.value
+        is_user: function () {
+          return !!use_app_store()
+            .user
         },
       },
     }).createMachine({
       id: 'xauth',
-      context: function ({
-        input,
-      }) {
+      context: function () {
         return {
-          ...input,
           xfetch_refresh_waiters:
             [],
-          update_access_token:
-            (
-              token?:
-                | string
-                | null,
-            ) => {
-              token &&
-                localStorage.setItem(
-                  'access_token',
-                  token,
-                )
-            },
-          update_refresh_token:
-            (
-              token?:
-                | string
-                | null,
-            ) => {
-              token &&
-                localStorage.setItem(
-                  'refresh_token',
-                  token,
-                )
-            },
-          get_access_token:
-            () =>
-              localStorage.getItem(
-                'access_token',
-              ),
-          get_refresh_token:
-            () =>
-              localStorage.getItem(
-                'refresh_token',
-              ),
         }
       },
       initial: 'Init',
@@ -310,16 +254,15 @@ export namespace xauth {
 
                 invoke: {
                   id: 'refresh',
-                  input: ({
-                    context,
-                  }) => {
-                    return {
-                      body: {
-                        refresh_token:
-                          context.get_refresh_token()!,
-                      },
-                    }
-                  },
+                  input:
+                    () => {
+                      return {
+                        body: {
+                          refresh_token:
+                            use_app_stuff().get_refresh_token()!,
+                        },
+                      }
+                    },
                   onDone: {
                     target:
                       'Idle',
@@ -386,7 +329,6 @@ export namespace xauth {
                 invoke: {
                   id: 'sign-in',
                   input: ({
-                    context,
                     event,
                   }) => {
                     assertEvent(
@@ -430,10 +372,9 @@ export namespace xauth {
                           },
                       },
                       {
-                        type: 'update_username',
+                        type: 'update_nik',
                         params:
                           ({
-                            context,
                             event,
                           }) => {
                             const {
@@ -444,15 +385,9 @@ export namespace xauth {
                                 '/auth/sign-in'
                               >
 
-                            return context
-                              .username
-                              .value ===
-                              nik
-                              ? null
-                              : {
-                                  username:
-                                    nik,
-                                }
+                            return {
+                              nik: nik,
+                            }
                           },
                       },
                     ],
